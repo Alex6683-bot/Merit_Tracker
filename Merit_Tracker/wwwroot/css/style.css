@@ -1,0 +1,49 @@
+﻿body {
+    display: flex;
+    min-height: 100vh;
+}
+.sidebar-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: left;
+    border-bottom: 2px solid #c1c1c1;
+    padding-bottom: 0.1rem
+}
+
+.logout-text {
+    color: red;
+}
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+main {
+    flex: 1;
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}

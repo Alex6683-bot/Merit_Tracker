@@ -1,0 +1,71 @@
+body {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
+.login-card {
+    background-color: white;
+    padding: 2rem 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 350px;
+}
+
+.login-card .form-label {
+    font-weight: 600;
+    color: #5c4d7d;
+}
+
+
+.login-submit {
+    background-color: #6a11cb;
+    border: 0;
+    transition: filter 0.1s ease;
+    min-height: 35px
+}
+
+.login-submit:hover {
+    background-color: #6a11cb;
+    border: 0;
+    filter: brightness(1.2) !important;
+    transition: filter 0.1s ease;
+}
+
+#usernameInput:focus,
+#passwordInput:focus {
+    outline: 2px solid #6a11cb;
+    box-shadow: 0 0 0 0.25rem rgba(106, 17, 203, 0.25) !important;
+    border: 0;
+}
+
+
+.login-title {
+    text-align: center;
+    font-size: 1.75rem;
+    color: #6a11cb;
+    margin-bottom: 1.5rem;
+}
+
+.login-submit:active {
+    background-color: #6a11cb !important;
+    filter: brightness(1.5) !important;
+    transition: filter 0.1s ease;
+    border: 0 !important;
+}
+
+.login-submit:focus {
+    background-color: #6a11cb;
+}
+
+.spinner-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: none;
+
+}
+.spinner-border{
+    height: 1.5rem;
+    width: 1.5rem;
+    border-width: 0.3rem;
+}

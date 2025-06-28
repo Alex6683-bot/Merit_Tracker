@@ -1,0 +1,64 @@
+﻿@page
+@model Merit_Tracker.Pages.DashboardAdminModel
+@{
+}
+
+<html>
+	<head>
+		<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+        <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+	</head>
+	<body>
+        <div class="dashboard-container">
+            <div class="main-panel">
+                <div class="dashboard-header">
+                    <h1>Welcome, Jeff</h1>
+			</div>
+                <div class="database-section">
+                    <h2 class="database-header">Merit Databases</h2>
+                    <div class='database-container'>
+                        <button class="database-button">
+                            Mooroolbark College 2025
+                        </button>
+                        <button class="database-button">
+                            Mooroolbark College 2025
+                        </button>
+                    </div>
+                </div>
+
+                <div class="activity-section">
+                    <h2 class="activity-header">Recent Activity</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Actvitiy Type</th>
+                                <th scope="col">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Database Append</td>
+                                <td>3/3/2009 15:30</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Database Edit</td>
+                                <td>3/5/2010 12:30</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Database Remove</td>
+                                <td>3/5/2011 12:30</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+		<script src="~/js/admin.js" asp-append-version="true"></script>
+	</body>
+		
+</html>
