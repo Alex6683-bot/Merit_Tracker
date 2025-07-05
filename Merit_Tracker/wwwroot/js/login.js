@@ -6,6 +6,7 @@ var inputElements = form.querySelectorAll('.form-control');
 form.addEventListener('submit', function (event) {
 
     event.preventDefault();
+    //validate_inputs();
 
     add_button_load();
 
@@ -69,5 +70,11 @@ function make_form_invalid() {
 function remove_form_invalid() {
     inputElements.forEach((input) => {
         if (input.classList.contains('is-invalid')) input.classList.remove('is-invalid');
+    })
+}
+
+function validate_inputs() {
+    inputElements.forEach((element) => {
+        element.value = element.value.trim();
     })
 }

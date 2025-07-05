@@ -1,4 +1,5 @@
 using Merit_Tracker.Database;
+using Merit_Tracker.Interfaces;
 using Merit_Tracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

@@ -26,7 +26,6 @@ namespace Merit_Tracker.Database
 
             return builder;
 
-
         }
     }
 }

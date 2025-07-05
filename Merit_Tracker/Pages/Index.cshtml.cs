@@ -46,7 +46,7 @@ namespace Merit_Tracker.Pages
 
                 if (user.Role == "Admin")
                     return RedirectToPage("DashboardAdmin");
-                else if (user.Role == "User")
+                else if (user.Role == "Teacher")
                     return RedirectToPage("DashboardUser");
             }
 

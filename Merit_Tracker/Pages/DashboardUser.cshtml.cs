@@ -1,4 +1,5 @@
 using Merit_Tracker.Database;
+using Merit_Tracker.Interfaces;
 using Merit_Tracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,7 +21,7 @@ namespace Merit_Tracker.Pages
 			HttpContext.Session.TryGetValue("Role", out byte[] role);
 
 
-			if (id == null || System.Text.Encoding.Default.GetString(role) != "User") return RedirectToPage("Index");
+			if (id == null || System.Text.Encoding.Default.GetString(role) != "Teacher") return RedirectToPage("Index");
 
             int userID = BitConverter.ToInt32(id); //Get User ID from id bytes
             currentUser = _dbContext.Users.Where(u => u.ID == userID).ToList().FirstOrDefault();
