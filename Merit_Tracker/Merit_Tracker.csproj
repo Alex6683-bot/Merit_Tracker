@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Classes\" />
+    <Folder Include="wwwroot\media\icons\" />
   </ItemGroup>
 
 </Project>

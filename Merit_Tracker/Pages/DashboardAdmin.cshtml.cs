@@ -22,6 +22,9 @@ namespace Merit_Tracker.Pages
 
             if (id == null || System.Text.Encoding.Default.GetString(role) != "Admin") return RedirectToPage("Index");
 
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(id);
+
             int userID = BitConverter.ToInt32(id); //Get User ID from id bytes
             currentUser = _dbContext.Users.Where(u => u.ID == userID).ToList().FirstOrDefault();
             return Page();

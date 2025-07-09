@@ -41,7 +41,7 @@ namespace Merit_Tracker.Pages
             if (user != null && user.Password == hashedPassword)
             {
                 HttpContext.Session.Clear();
-                HttpContext.Session.SetInt32("UserID", user.UserId);
+                HttpContext.Session.SetInt32("UserID", user.ID);
                 HttpContext.Session.SetString("Role", user.Role);
 
                 if (user.Role == "Admin")

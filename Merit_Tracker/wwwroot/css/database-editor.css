@@ -1,6 +1,222 @@
-﻿body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f6fa;
-    color: blue;
-    /*color: #2c3e50;*/
+﻿.page-heading h1 {
+    font-size: 40px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Helvetica, sans-serif;
+    font-weight: 400;
+
+}
+.page-heading {
+    border-bottom: solid #bdc3c7 2px;
+    display: flex;
+    justify-content: space-between;
+}
+.heading-section {
+    margin-left: 0.9rem;
+}
+
+.container {
+    min-height: 100vh;
+}
+
+.export-button {
+    align-items: flex-end;
+    margin-right: 10px;
+    margin-top: 6px;
+    margin-bottom: 10px;
+    border: none;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    background: linear-gradient(135deg, #4364f7, #6200ea);
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+.export-button:hover {
+    background: linear-gradient(135deg, #3148c3, #4a00b1);
+}
+
+.database-heading {
+    text-align: left;
+    display: flex;
+    border-bottom: solid #bdc3c7 2px;
+    justify-content: space-between;
+}
+.database-heading h1, .activity-heading h1 {
+    font-size: 25px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #34495E;
+    align-self: end;
+}
+.activity-heading {
+    border-bottom: solid #bdc3c7 2px;
+}
+.database-section {
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    margin-right: 40px;
+}
+.crud-section {
+    display: flex;
+    align-self: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 2px;
+}
+.crud-button {
+    min-width: 35px;
+    height: 35px;
+    font-size: 20px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #4364f7, #6200ea);
+}
+.crud-button:hover {
+    background: linear-gradient(135deg, #3148c3, #4a00b1);
+}
+.database-list {
+    background: #E1E1E1;
+    border-radius: 10px;
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.7);
+    margin-top: 15px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    padding: 0.7rem;
+    overflow-y: auto;
+}
+.activity-section {
+    margin-right: 12px;
+
+}
+.activity-heading {
+    display: flex;
+    align-self: stretch;
+}
+.activity-list {
+    background: #E1E1E1;
+    border-radius: 10px;
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.7);
+    margin-top: 15px;
+    height: 450px;
+}
+.main-section {
+    margin-left: 0.9rem;
+    margin-top: 30px;
+}
+
+/*merit view styles*/
+
+.merit-main-details {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #BDC3C7;
+    padding-bottom: 2px;
+}
+.merit-view {
+    background: white;
+    border-radius: 10px; 
+    padding: 0.5rem;
+    
+}
+.merit-view-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+}
+.merit-view-name {
+    font-family: 'Segoe UI';
+    font-size: 24px;
+    font-weight: bold;
+}
+.merit-view-date {
+    align-content: center;
+    color: #777777;
+    font-family: 'Segoe UI';
+    font-size: 18px;
+}
+.merit-view-container {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+}
+.merit-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.merit-view-misc-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+.misc-detail {
+    background: red;
+    border-radius: 30px;
+    justify-content: center;
+    padding: 10px;
+    max-width: 233px;
+    text-align: center;
+    font-size: 15px;
+    align-content: space-evenly;
+}
+
+.form-check-input {
+    padding: 13px;
+    margin-top: 7px;
+}
+
+.merit-list li:hover {
+    background: #f0f0f5;
+}
+
+.value {
+    background: rgba(76, 91, 212, 0.5);
+    color: rgba(76, 91, 212, 1.0);
+    font-weight: bold;
+}
+.house-points {
+    background: rgba(27, 142, 100, 0.5);
+    color: rgba(27, 142, 100, 1.0);
+    font-weight: bold;
+}
+.issued-by {
+    background: rgba(233, 113, 50, 0.5);
+    color: rgba(233, 113, 50, 1.0);
+    font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/*scroll bar*/
+
+.database-list::-webkit-scrollbar {
+    width: 11px;
+    border-radius: 30px;
+}
+
+.database-list::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+.database-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.database-list::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: 20px;
 }
