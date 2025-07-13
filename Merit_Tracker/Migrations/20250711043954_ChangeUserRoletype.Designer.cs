@@ -3,6 +3,7 @@ using System;
 using Merit_Tracker.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Merit_Tracker.Migrations
 {
     [DbContext(typeof(AppDatabaseContext))]
-    partial class AppDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250711043954_ChangeUserRoletype")]
+    partial class ChangeUserRoletype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,32 +24,6 @@ namespace Merit_Tracker.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseSerialColumns(modelBuilder);
-
-            modelBuilder.Entity("Merit_Tracker.Models.DatabaseModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DatabaseID")
-                        .HasColumnType("integer")
-                        .HasColumnName("DatabaseID");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Name");
-
-                    b.Property<int>("UserID")
-                        .HasColumnType("integer")
-                        .HasColumnName("UserID");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Databases");
-                });
 
             modelBuilder.Entity("Merit_Tracker.Models.MeritModel", b =>
                 {
@@ -61,7 +38,7 @@ namespace Merit_Tracker.Migrations
                         .HasColumnName("DatabaseID");
 
                     b.Property<DateTime>("DateOfIssue")
-                        .HasColumnType("date")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("DateOfIssue");
 
                     b.Property<int>("HousePoints")

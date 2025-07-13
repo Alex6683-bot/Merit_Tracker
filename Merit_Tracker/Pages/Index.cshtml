@@ -1,46 +1,4 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Login";
 }
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
-</head>
-<body>
-    <div class="container min-vh-100 justify-content-center align-items-center d-flex">
-        <div class="login-card">
-            <h2 class="login-title">Welcome Back</h2>
-            <form method="post" class="login-form needs-validation" novalidate>
-                <div class="mb-3 form-floating">
-                    <input class="form-control" id="usernameInput" name="username" placeholder="" asp-for="@Model.Username" required>
-                    <label for="usernameInput" class="form-label">Username</label>
-                    <div class="invalid-feedback username-invalid">
-                        Invalid Username
-                    </div>
-                </div>
-                <div class="mb-3 form-floating">
-                    <input type="password" class="form-control" id="passwordInput" name="password" asp-for="@Model.Password" placeholder="" required>
-                    <label for="passwordInput" class="form-label">Password</label>
-                    <div class="invalid-feedback password-invalid">
-                        Invalid Password
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 login-submit shadow-none">
-                    <div class="content">Login</div>
-                    <div class="spinner-container">
-                        <div class="spinner-border" role="status">
-                        </div>
-                    </div>
-                </button>
-            </form>
-        </div>
-    </div>
-
-
-    <script src="~/js/login.js" asp-append-version="true"></script>
-</body>
-</html>

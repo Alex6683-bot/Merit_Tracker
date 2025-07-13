@@ -1,16 +1,21 @@
 ﻿var form = document.querySelector('.login-form');
 var submit_button = document.querySelector('.login-submit');
 
+var userInput = document.querySelector('#usernameInput');
+var passwordInput = document.querySelector('#passwordInput');
+
 var inputElements = form.querySelectorAll('.form-control');
 
 form.addEventListener('submit', function (event) {
 
     event.preventDefault();
-    //validate_inputs();
 
     add_button_load();
 
     if (form.checkValidity()) {
+        userInput.value = userInput.value.trim();
+        passwordInput.value = passwordInput.value.trim();
+
         let data = new FormData(form);
         fetch('', {
             method: 'post',
@@ -23,9 +28,9 @@ form.addEventListener('submit', function (event) {
                 make_form_invalid();
                 return;
             }
-            else {
-                window.location.href = response.url;
-            }
+            response.json().then(data => {
+                window.location.href = data.url;
+            });
         });
 
     }
@@ -73,8 +78,3 @@ function remove_form_invalid() {
     })
 }
 
-function validate_inputs() {
-    inputElements.forEach((element) => {
-        element.value = element.value.trim();
-    })
-}

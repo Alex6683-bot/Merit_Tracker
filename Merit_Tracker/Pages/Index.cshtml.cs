@@ -10,52 +10,31 @@ namespace Merit_Tracker.Pages
 {
     public class IndexModel : PageModel
     {
-        [BindProperty]
-        public string Username { get; set; }
 
-        [BindProperty]
-        public string Password { get; set; }
 
-        private readonly ILogger<IndexModel> _logger;
-        private readonly AppDatabaseContext _dbContext;
-
-        public IndexModel(ILogger<IndexModel> logger, AppDatabaseContext dbContext)
+        public IActionResult OnGet()
         {
-            _logger = logger;
-            _dbContext = dbContext;
-        }
-
-        public void OnGet()
-        {
-            
-        }
-
-        public IActionResult OnPost()
-        {
-            SHA256 sha256 = SHA256.Create();
-            string hashedPassword = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(Password)));
-            sha256.Dispose();
-
-            UserModel user = _dbContext.Users.Where(u => u.UserName == Username).ToList().FirstOrDefault();
-
-            if (user != null && user.Password == hashedPassword)
+            if (HttpContext.Session != null || HttpContext.Session.Keys.Count() > 0)
             {
-                HttpContext.Session.Clear();
-                HttpContext.Session.SetInt32("UserID", user.ID);
-                HttpContext.Session.SetString("Role", user.Role);
+                HttpContext.Session.TryGetValue("UserID", out byte[] id);
+                HttpContext.Session.TryGetValue("Role", out byte[] role);
 
-                if (user.Role == "Admin")
-                    return RedirectToPage("DashboardAdmin");
-                else if (user.Role == "Teacher")
-                    return RedirectToPage("DashboardUser");
+                if (id == null) return RedirectToPage("Login");
+
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(role);
+                    Array.Reverse(id);
+
+                UserRole roleConverted = (UserRole)BitConverter.ToInt32(role);
+
+                if (roleConverted == UserRole.Admin || roleConverted == UserRole.Teacher) return RedirectToPage("Dashboard");
+
             }
+            return RedirectToPage("Login");
+        }
 
-            return new ContentResult() 
-            {
-                    Content = "Error Login",
-                    ContentType = "text/plain",
-                    StatusCode = 400
-            };
+        public void OnPost()
+        {
 
             
         }

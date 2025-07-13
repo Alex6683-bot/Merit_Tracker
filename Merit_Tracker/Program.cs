@@ -9,12 +9,11 @@ builder.Services.AddDbContext<AppDatabaseContext>(options =>
 );
 
 builder.Services.AddRazorPages();
-builder.Services.AddDbContext<AppDatabaseContext>();
 builder.Services.AddSession();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(1);
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddMemoryCache();
 

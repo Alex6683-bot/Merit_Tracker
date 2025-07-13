@@ -8,32 +8,6 @@
 	</head>
 	<body>
 		<div class="container">
-           <!--<div class="header-section">
-                <div class="page-heading">
-                    <h1>Database Editor</h1>
-					<button class="export-button">Export as CSV</button>
-				</div>
-			</div>
-			<div class="main-section row g-4">
-				<div class="database-section col">
-					<div class="database-heading">
-						<h1>Mooroolbark College 2025</h1>
-						<div class="crud-section">
-							<button class="crud-button"><img width="17" src="~/media/icons/plus.png"/></button>
-							<button class="crud-button"></button>
-							<button class="crud-button"></button>
-							<button class="crud-button"></button>
-						</div>
-					</div>
-					<div class="database-list">
-						hi
-					</div>
-				</div>
-				<div class="activity-section col">
-					hi
-				</div>
-			</div>-->
-
 			<div class="heading-section row-1 mt-3">
 				<div class="col">
 					<div class="page-heading">
@@ -48,10 +22,10 @@
 						<div class="database-heading col">
 							<h1>Mooroolbark College 2025</h1>
 							<div class="crud-section">
-								<button class="crud-button"><img width="19" src="~/media/icons/plus.png" style="vertical-align: -2px"/></button>
-								<button class="crud-button"><img width="19" src="~/media/icons/edit.png" style="vertical-align: -1px"/></button>
-								<button class="crud-button"><img width="23" src="~/media/icons/delete.png" style="vertical-align: -3px"/></button>
-								<button class="crud-button"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
+								<button class="crud-button add-button"><img width="19" src="~/media/icons/plus.png" style="vertical-align: -2px"/></button>
+								<button class="crud-button edit-button"><img width="19" src="~/media/icons/edit.png" style="vertical-align: -1px"/></button>
+								<button class="crud-button delete-button"><img width="23" src="~/media/icons/delete.png" style="vertical-align: -3px"/></button>
+								<button class="crud-button filter-button"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
 							</div>
 						</div>
 					</div>
@@ -63,7 +37,7 @@
 								{
 									<li class="merit-view">
 										<label class="merit-view-label">
-											<input type="checkbox" class="merit-view-checkbox form-check-input"/>
+											<input type="radio" name="merit-select-radio" class="merit-view-radio form-check-input"/>
 											<div class="merit-view-container">
 												<div class="merit-main-details">
 													<div class="merit-view-name">Ryan Thomson</div>
@@ -95,5 +69,7 @@
 					</div>
 				</div>
 			</div>
+		<script src="~/js/database-editor.js" asp-append-version="true"></script>
+
 	</body>
 </html>

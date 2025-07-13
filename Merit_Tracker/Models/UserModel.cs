@@ -3,6 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Merit_Tracker.Models
 {
+    public enum UserRole
+    {
+        Admin = 1, Teacher
+    }
     [Table("users")]
     public class UserModel
     {
@@ -18,7 +22,7 @@ namespace Merit_Tracker.Models
 
         public int UserId { get; set; }
 
-        public string Role { get; set; }
+        public UserRole Role { get; set; }
 
     }
 }

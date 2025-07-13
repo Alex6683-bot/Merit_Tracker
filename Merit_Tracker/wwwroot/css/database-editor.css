@@ -76,6 +76,13 @@
 .crud-button:hover {
     background: linear-gradient(135deg, #3148c3, #4a00b1);
 }
+
+.crud-button:disabled {
+    background: linear-gradient(135deg, #a3a3c2, #bdbddf);
+    color: #eeeeee;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
 .database-list {
     background: #E1E1E1;
     border-radius: 10px;
@@ -219,4 +226,10 @@
     border: 2px solid transparent;
     background-clip: content-box;
     border-radius: 20px;
+}
+input[type="radio"]:checked {
+    background: #6200ea;
+    accent-color: #6200ea;
+    border: 1px solid #6200ea;
+    box-shadow: none;
 }

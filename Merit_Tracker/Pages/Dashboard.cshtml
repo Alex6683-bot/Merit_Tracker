@@ -1,0 +1,43 @@
+﻿@page
+@model Merit_Tracker.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<html>
+	<head>
+		<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+        <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+	</head>
+	<body>
+        <div class="dashboard-container">
+           <div class="main-panel">
+                <div class="dashboard-header">
+                    <h1>Welcome, @Model.currentUser.FirstName</h1>
+			</div>
+                <div class="database-section">
+                    <h2 class="database-header">Merit Databases</h2>
+                    <div class='database-container'>
+                    @{
+                        List<Merit_Tracker.Models.DatabaseModel> databases =  Model.dbContext.Databases.Where(
+                                d => d.UserID == Model.currentUser.ID).ToList(); // Get list of databases that is accessible by the user
+
+                        foreach (var database in databases) // Loop through databases
+                        {
+                            <button class="database-button">
+                                @database.Name
+                            </button>
+                        }                        
+
+                    }
+                    </div>
+                </div>
+
+              
+            </div> 
+        </div>
+		<script src="~/js/admin.js" asp-append-version="true"></script>
+	</body>
+		
+</html>
