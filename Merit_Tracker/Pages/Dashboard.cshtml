@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{handler?}"
 @model Merit_Tracker.Pages.DashboardModel
 @{
     ViewData["Title"] = "Dashboard";
@@ -6,7 +6,7 @@
 
 <html>
 	<head>
-		<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+		<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
         <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 	</head>
@@ -25,9 +25,9 @@
 
                         foreach (var database in databases) // Loop through databases
                         {
-                            <button class="database-button">
+                            <a class="database-button" asp-page-handler="redirect" asp-route-databaseID=@database.DatabaseID>
                                 @database.Name
-                            </button>
+                            </a>
                         }                        
 
                     }

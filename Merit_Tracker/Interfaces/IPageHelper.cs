@@ -3,7 +3,7 @@ using Merit_Tracker.Models;
 
 namespace Merit_Tracker.Interfaces
 {
-    public interface IUserPage
+    public interface IPageHelper
     {
         public UserModel currentUser { get; set; }
     }

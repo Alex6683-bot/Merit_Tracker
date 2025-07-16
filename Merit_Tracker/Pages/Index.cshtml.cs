@@ -19,11 +19,13 @@ namespace Merit_Tracker.Pages
                 HttpContext.Session.TryGetValue("UserID", out byte[] id);
                 HttpContext.Session.TryGetValue("Role", out byte[] role);
 
-                if (id == null) return RedirectToPage("Login");
+                if (id == null || role == null) return RedirectToPage("Login");
 
                 if (BitConverter.IsLittleEndian)
-                    Array.Reverse(role);
+                {
                     Array.Reverse(id);
+                    Array.Reverse(role);
+                }
 
                 UserRole roleConverted = (UserRole)BitConverter.ToInt32(role);
 

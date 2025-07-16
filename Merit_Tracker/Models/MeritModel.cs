@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Merit_Tracker.Models
 {
-    public enum MeritValueType
+    public enum MeritValue
     {
-        Respect,
+        Respect = 1,
         Resilience,
         Endeavour,
         Compassion
@@ -24,7 +25,7 @@ namespace Merit_Tracker.Models
         public DateTime DateOfIssue { get; set; }
 
         [Column("Value")]
-        public MeritValueType Value { get; set; }
+        public MeritValue Value { get; set; }
 
         [Column("HousePoints")]
         public int HousePoints { get; set;}
@@ -32,10 +33,15 @@ namespace Merit_Tracker.Models
         [Column("IssuerID")]
         public int IssuerID { get; set; }
 
+		[Column("IssueName")]
+        public string IssuerName { get; set; }
 
-        [Column("DatabaseID")]
+
+		[Column("DatabaseID")]
         public int DatabaseID { get; set; }
 
 
     }
+
+
 }

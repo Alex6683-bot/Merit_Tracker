@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{databaseID}"
 @model Merit_Tracker.Pages.DatabaseEditor
 @{
 }
@@ -22,10 +22,10 @@
 						<div class="database-heading col">
 							<h1>Mooroolbark College 2025</h1>
 							<div class="crud-section">
-								<button class="crud-button add-button"><img width="19" src="~/media/icons/plus.png" style="vertical-align: -2px"/></button>
-								<button class="crud-button edit-button"><img width="19" src="~/media/icons/edit.png" style="vertical-align: -1px"/></button>
+								<button class="crud-button add-button" data-bs-toggle="modal" data-bs-target="#merit-record-modal"><img width="19" src="~/media/icons/plus.png" style="vertical-align: -2px"/></button>
+								<button class="crud-button edit-button" data-bs-toggle="modal" data-bs-target="#merit-record-modal"><img width="19" src="~/media/icons/edit.png" style="vertical-align: -1px"/></button>
 								<button class="crud-button delete-button"><img width="23" src="~/media/icons/delete.png" style="vertical-align: -3px"/></button>
-								<button class="crud-button filter-button"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
+								<button class="crud-button filter-button" data-bs-toggle="modal" data-bs-target="#merit-filter-modal"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
 							</div>
 						</div>
 					</div>
@@ -33,33 +33,14 @@
 						<div class="database-list col">
 							<form class="merit-list-input">
 								<ul class="merit-list">
-								@for (int i = 0; i < 5; i++)
-								{
-									<li class="merit-view">
-										<label class="merit-view-label">
-											<input type="radio" name="merit-select-radio" class="merit-view-radio form-check-input"/>
-											<div class="merit-view-container">
-												<div class="merit-main-details">
-													<div class="merit-view-name">Ryan Thomson</div>
-													<div class="merit-view-date">21 May 2025</div>
-												</div>
-												<div class="merit-view-misc-details">
-													<div class="value misc-detail">Value: <span>Endeavour</span></div>
-													<div class="house-points misc-detail">House Points: <span>3</span></div>
-													<div class="issued-by misc-detail">Issued by: <span>Jack Grealish</span></div>
-												</div>
-											</div>
-										</label>
-									</li>
-								}
-
+									<partial name="_DatabaseList" model="Model.MeritRecords"/>
 								</ul>
 							</form>
 						</div>
 					</div>
 				</div>
 				<div class="col-4 px-0 activity-section">
-					<div class="row g-0">
+					<div class="row g-0">                                                                   
 						<div class="activity-heading col">
 							<h1>Activity Logs</h1>
 						</div>
@@ -69,6 +50,93 @@
 					</div>
 				</div>
 			</div>
+
+			<!--Add/Edit Modal-->
+			<div class="modal fade" id="merit-record-modal" tabindex="-1" aria-labelledby="merit-modal" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content rounded-4 border-0">
+						<div class="modal-header border-0 pb-0">
+							<h4 class="modal-title fw-bold" id="addMeritLabel"></h4>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<hr class="mt-2 mb-0" />
+						<div class="modal-body">
+							<form class="merit-form needs-validation" method="post" novalidate>
+								<div class="mb-3">
+									<label class="form-label fw-bold text-dark" for="studentName">Student Name:</label>
+									<input type="text" id="studentName" class="form-control merit-input" placeholder="Enter Student Name" asp-for=@Model.MeritStudentName required/>
+								</div>
+								<div class="mb-3">
+									<label class="form-label fw-bold text-dark" for="meritValue">Value:</label>
+									<select id="meritValue" class="form-select merit-input" asp-items="Html.GetEnumSelectList<Merit_Tracker.Models.MeritValue>()" asp-for=@Model.MeritValue required>
+									</select>
+								</div>
+								<div class="mb-4">
+									<label class="form-label fw-bold text-dark" for="housePoints">House Points:</label>
+									<input type="number" id="housePoints" class="form-control merit-input" placeholder="Enter house points" asp-for=@Model.MeritHousePoints required/>
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary btn-gradient text-white fw-bold rounded-pill merit-modal-submit">Submit</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--Filter Modal-->
+			<div class="modal fade" id="merit-filter-modal" tabindex="-1" aria-labelledby="filterMeritLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content rounded-4 border-0">
+						<div class="modal-header border-0 pb-0">
+							<h4 class="modal-title fw-bold" id="filterMeritLabel">Filter Merit Records</h4>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<hr class="mt-2 mb-0" />
+						<div class="modal-body">
+							<form class="filter-form">
+								<div class="mb-3">
+									<label class="form-label fw-bold text-dark" for="filterValue">Value:</label>
+									<select id="filterValue" class="form-select merit-input">
+										<option disabled selected hidden>Select Value</option>
+										<option>Resilience</option>
+										<option>Respect</option>
+										<option>Responsibility</option>
+										<option>Endeavour</option>
+									</select>
+								</div>
+								<div class="mb-3">
+									<label class="form-label fw-bold text-dark" for="filterStartDate">Start Date:</label>
+									<input type="date" id="filterStartDate" class="form-control merit-input" />
+								</div>
+								<div class="mb-4">
+									<label class="form-label fw-bold text-dark" for="filterEndDate">End Date:</label>
+									<input type="date" id="filterEndDate" class="form-control merit-input" />
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary btn-gradient text-white fw-bold rounded-pill merit-modal-filter-button">Apply Filter</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--Feedback Modal-->
+			<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content border-0">
+						<div class="modal-header text-white" id="feedbackModalHeader">
+							<h5 class="modal-title fw-bold" id="feedbackModalLabel">Status</h5>
+							<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body fw-medium fs-5" id="feedbackModalBody">	
+						</div>
+					</div>
+				</div>
+			</div>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 		<script src="~/js/database-editor.js" asp-append-version="true"></script>
 
 	</body>

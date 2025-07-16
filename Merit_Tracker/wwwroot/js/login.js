@@ -3,14 +3,13 @@ var submit_button = document.querySelector('.login-submit');
 
 var userInput = document.querySelector('#usernameInput');
 var passwordInput = document.querySelector('#passwordInput');
-
 var inputElements = form.querySelectorAll('.form-control');
 
 form.addEventListener('submit', function (event) {
 
     event.preventDefault();
 
-    add_button_load();
+    addButtonLoad();
 
     if (form.checkValidity()) {
         userInput.value = userInput.value.trim();
@@ -22,10 +21,10 @@ form.addEventListener('submit', function (event) {
             body: data
         }).then(response => {
 
-            remove_button_load();
+            removeButtonLoad();
 
             if (response.status != 200) {
-                make_form_invalid();
+                addFormInvalid();
                 return;
             }
             response.json().then(data => {
@@ -35,8 +34,8 @@ form.addEventListener('submit', function (event) {
 
     }
     else {
-        make_form_invalid();
-        remove_button_load();
+        addFormInvalid();
+        removeButtonLoad();
     }
 
 }, false);
@@ -44,12 +43,12 @@ form.addEventListener('submit', function (event) {
 inputElements.forEach((input) => {
     input.addEventListener('input', () => {
         if (form.classList.contains('was-validated')) form.classList.remove('was-validated');
-        remove_form_invalid();
+        removeFormInvalid();
     })
 })
 
 
-function remove_button_load() {
+function removeButtonLoad() {
     let button_content = submit_button.querySelector('.content');
     let spinner_container = submit_button.querySelector('.spinner-container');
 
@@ -57,7 +56,7 @@ function remove_button_load() {
     spinner_container.style.display = 'none';
 }
 
-function add_button_load() {
+function addButtonLoad() {
     let button_content = submit_button.querySelector('.content');
     let spinner_container = submit_button.querySelector('.spinner-container');
 
@@ -66,13 +65,13 @@ function add_button_load() {
     spinner_container.style.display = 'inline-block';
 }
 
-function make_form_invalid() {
+function addFormInvalid() {
     inputElements.forEach((input) => {
         input.classList.add('is-invalid');
     })
 }
 
-function remove_form_invalid() {
+function removeFormInvalid() {
     inputElements.forEach((input) => {
         if (input.classList.contains('is-invalid')) input.classList.remove('is-invalid');
     })

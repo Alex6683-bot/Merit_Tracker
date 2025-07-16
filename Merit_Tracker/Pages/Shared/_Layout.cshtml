@@ -15,7 +15,7 @@
             <div class="sidebar-title">Merit Tracker</div>
             <div class="nav-links">
                 <!--Making the dashboard side button active only if the current page is dashboard-->
-                <a href="/DashboardAdmin" class="nav-item @(ViewData["Title"] == "Dashboard" ? "active" : "")">Dashboard</a> 
+                <a href="/Dashboard" class="nav-item @(ViewData["Title"] == "Dashboard" ? "active" : "")">Dashboard</a> 
                 <a href="#" class="nav-item"><span class="logout-text">Log Out</span></a>
             </div>
         </div>
@@ -26,7 +26,7 @@
 
 
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
         @await RenderSectionAsync("Scripts", required: false)
     </body>

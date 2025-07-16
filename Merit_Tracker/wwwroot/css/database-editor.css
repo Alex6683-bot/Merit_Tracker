@@ -233,3 +233,26 @@ input[type="radio"]:checked {
     border: 1px solid #6200ea;
     box-shadow: none;
 }
+
+/*Modal*/
+.merit-input:focus {
+    border-color: #6200ea;
+    box-shadow: 0 0 0 0.15rem rgba(98, 0, 234, 0.25);
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, #4364f7, #6200ea);
+    border: none;
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(135deg, #3148c3, #4a00b1);
+}
+
+.feedback-success {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.feedback-failure {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
