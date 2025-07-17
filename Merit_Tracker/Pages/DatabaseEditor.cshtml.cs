@@ -1,4 +1,5 @@
 using Merit_Tracker.Database;
+using Merit_Tracker.Helpers;
 using Merit_Tracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,6 +16,8 @@ namespace Merit_Tracker.Pages
         // Modal Forms
         [BindProperty]
         public string MeritStudentName { get; set; }
+        [BindProperty]
+        public int MeritID { get; set; } // Currently selected merit's id
 		[BindProperty]
 		public MeritValue MeritValue { get; set; }
 		[BindProperty]
@@ -29,19 +32,11 @@ namespace Merit_Tracker.Pages
 
         public IActionResult OnGet(int databaseID)
         {
-            var user = GetCurrentUser();
-            if (user == null) return RedirectToPage("/Login"); // Return to login if current user is null or invalid
+			var result = InitializeEditor(databaseID);
 
-            CurrentUser = user;
+			if (result != null) return result; // Return the page result if it doesn't return null
 
-            // Get the database matching the ID and user
-            CurrentDatabase = GetDatabase(databaseID, CurrentUser);
-           
-            if (CurrentDatabase == null) return RedirectToPage("/Dashboard"); // If database doesn't belong to user, redirect back to dashboard
-            // Get all merit records from the database
-            MeritRecords = dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToList();
-
-            return Page();
+			return Page();
         }
 
 		public string GetIssuerFullName(int userID)
@@ -50,26 +45,18 @@ namespace Merit_Tracker.Pages
 			return $"{issuingUser.FirstName} {issuingUser.LastName}";
 		}
 
+
+        // Handler for adding merit
         public IActionResult OnPostAddMerit(int databaseID)
         {
-			var user = GetCurrentUser();
-			if (user == null) return RedirectToPage("/Login"); // Return to login if current user is null or invalid
-			CurrentUser = user;
+			var result = InitializeEditor(databaseID);
 
-
-			// Get the database matching the ID and user
-			CurrentDatabase = GetDatabase(databaseID, CurrentUser);
-
-			if (CurrentDatabase == null) return RedirectToPage("/Dashboard"); // If database doesn't belong to user, redirect back to dashboard
-			// Get all merit records from the database
-			MeritRecords = dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToList();
-
-			CurrentUser = user;
+			if (result != null) return result; // Return the page result if it doesn't return null
 
 			// Add to database
 			dbContext.Merits.Add(new MeritModel()
             {
-                StudentName = MeritStudentName,
+                StudentName = MeritStudentName.Trim(), // Trimming leading and following spaces for names
                 HousePoints = MeritHousePoints,
                 Value = MeritValue,
                 DateOfIssue = DateTime.Now,
@@ -84,35 +71,46 @@ namespace Merit_Tracker.Pages
             return Partial("_DatabaseList", MeritRecords);
         }
 
-
-        // Gets the current user from the session
-        UserModel GetCurrentUser()
+        // Handler for editing merit
+        public IActionResult OnPostEditMerit(int databaseID)
         {
-			// Get current user
-			HttpContext.Session.TryGetValue("UserID", out byte[] id);
-			HttpContext.Session.TryGetValue("Role", out byte[] role);
+            var result = InitializeEditor(databaseID);
 
-            if (id == null || role == null) return null;
+            if (result != null) return result; // Return the page result if it doesn't return null
 
-			if (BitConverter.IsLittleEndian)
-			{
-				Array.Reverse(id);
-				Array.Reverse(role);
-			}
+            // Get merit from database
+            MeritModel merit = dbContext.Merits.Where(m => m.Id == MeritID).FirstOrDefault();
+            if (merit == null) return StatusCode(500);
 
-			int userID = BitConverter.ToInt32(id); //Get User ID from id bytes
-			return dbContext.Users.Where(u => u.ID == userID).FirstOrDefault();
+            // Edit properties of record to form inputs
+            merit.StudentName = MeritStudentName.Trim(); // Trimming leading and following spaces
+            merit.Value = MeritValue;
+            merit.HousePoints = MeritHousePoints;
+
+			dbContext.SaveChanges();
+			MeritRecords = dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToList();
+
+			return Partial("_DatabaseList", MeritRecords);
 		}
 
 
-        DatabaseModel GetDatabase(int databaseID, UserModel user)
-        {
-            // Gets the matching database model from id and user
-			var database = dbContext.Databases.Where(d => d.DatabaseID == databaseID)
-			   .Where(d => d.UserID == user.ID).FirstOrDefault();
-            return database;
-		}
 
+        // Method to initialize all properties in this model
+        public IActionResult InitializeEditor(int databaseID)
+        {
+			var user = HelperMethods.GetCurrentUser(HttpContext, dbContext);
+			if (user == null) return RedirectToPage("/Login"); // Return to login if current user is null or invalid
+			CurrentUser = user;
+
+			// Get the database matching the ID and user
+			CurrentDatabase = HelperMethods.GetDatabase(databaseID, CurrentUser, dbContext);
+
+			if (CurrentDatabase == null) return RedirectToPage("/Dashboard"); // If database doesn't belong to user, redirect back to dashboard
+			// Get all merit records from the database
+			MeritRecords = dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToList();
+
+            return null;
+		}
 
 	}
 }

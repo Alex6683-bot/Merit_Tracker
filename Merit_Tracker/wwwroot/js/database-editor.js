@@ -1,20 +1,21 @@
-
-const radioCheckBoxes = document.querySelectorAll('.merit-view-radio');
 const addButton = document.querySelector('.add-button');
 const editButton = document.querySelector('.edit-button');
 const deleteButton = document.querySelector('.delete-button');
 
-editButton.disabled = true;
-deleteButton.disabled = true;
+bindRadioListeners();
+updateButtonState();
+
+function bindRadioListeners() {
+    const radioCheckBoxes = document.querySelectorAll('.merit-view-radio');
+    radioCheckBoxes.forEach((radioCheckBox) => {
+        radioCheckBox.addEventListener('change', updateButtonState);
+    });
+}
 
 
-radioCheckBoxes.forEach((radioCheckBox) => {
-    radioCheckBox.addEventListener('change', updateButtonState);
-});
-
-
-// Disable Edit/Delete buttons if radio button is not checked
+// Disable Edit & Delete buttons if radio button is not checked
 function updateButtonState() {
+    const radioCheckBoxes = document.querySelectorAll('.merit-view-radio');
     const anyChecked = Array.from(radioCheckBoxes).some(rb => rb.checked);
     editButton.disabled = !anyChecked;
     deleteButton.disabled = !anyChecked;
@@ -35,14 +36,16 @@ function changeModalState(title, dataMode) {
     if (dataMode == 'edit') {
         const studentNameInput = document.querySelector('#studentName');
         const meritValueInput = document.querySelector('#meritValue');
-        const meritHousePoints = document.querySelector('#housePoints');
+        const meritHousePointsInput = document.querySelector('#housePoints');
+        const meritIDInput = document.querySelector('#meritID');
 
         let selectedRadio = document.querySelector('input[name="merit-select-radio"]:checked');
         const meritRecord = selectedRadio.closest('.merit-view'); // Get merit view/record from the selected radio
 
         studentNameInput.value = meritRecord.getAttribute('data-student-name');
         meritValueInput.value = meritRecord.getAttribute('data-value');
-        meritHousePoints.value = meritRecord.getAttribute('data-house-points');
+        meritHousePointsInput.value = meritRecord.getAttribute('data-house-points');
+        meritIDInput.value = meritRecord.getAttribute('data-merit-id');
     }
 }
 
@@ -105,16 +108,39 @@ meritForm.addEventListener('submit', function (event) {
         }).then(responseHtml => {
             const meritList = document.querySelector('.merit-list');
             meritList.innerHTML = responseHtml;
+            bindRadioListeners();
+            updateButtonState();
+        });
+    }
+    // Resquest to edit merit handler
+    else if (meritForm.getAttribute('data-mode') == 'edit') {
+        fetch('?handler=EditMerit', {
+            method: 'post',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                showFeedbackModal(true, "Merit edited successfully");
+                meritForm.classList.remove('was-validated');
+                return response.text();
+            }
+            showFeedbackModal(false, "Failed to edit merit");
+
+        }).then(responseHtml => {
+            const meritList = document.querySelector('.merit-list');
+            meritList.innerHTML = responseHtml;
+            bindRadioListeners();
+            updateButtonState();
         });
     }
 
+    
 });
 
 
+// Handle Delete Button
+deleteButton.addEventListener('click', () => {
 
-
-
-meritSubmitButton = document.querySelector('.merit-modal-filter-button');
+})
 
 
 

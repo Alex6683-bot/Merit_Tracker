@@ -5,7 +5,7 @@
 
 @foreach (var meritRecord in Model)
 {
-	<li class="merit-view" data-merit-id=@meritRecord.Id data-student-name=@meritRecord.StudentName data-date=@meritRecord.DateOfIssue.Date.ToString("yyyy-MM-dd") data-value=@((int)meritRecord.Value) data-house-points=@meritRecord.HousePoints>
+	<li class="merit-view" data-merit-id="@meritRecord.Id" data-student-name="@meritRecord.StudentName" data-date="@meritRecord.DateOfIssue.Date.ToString("yyyy-MM-dd")" data-value="@((int)meritRecord.Value)" data-house-points="@meritRecord.HousePoints">
 		<label class="merit-view-label">
 			<input type="radio" name="merit-select-radio" class="merit-view-radio form-check-input" />
 			<div class="merit-view-container">
