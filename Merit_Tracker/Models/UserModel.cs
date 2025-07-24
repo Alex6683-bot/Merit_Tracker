@@ -22,5 +22,9 @@ namespace Merit_Tracker.Models
 
         public UserRole Role { get; set; }
 
-    }
+		public static implicit operator Task<object>(UserModel? v)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

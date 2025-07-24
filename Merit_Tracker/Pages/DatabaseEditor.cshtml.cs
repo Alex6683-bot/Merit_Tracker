@@ -1,8 +1,10 @@
 using Merit_Tracker.Database;
 using Merit_Tracker.Helpers;
+using Merit_Tracker.Interfaces;
 using Merit_Tracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Merit_Tracker.Pages
 {
@@ -24,93 +26,109 @@ namespace Merit_Tracker.Pages
         public int MeritHousePoints { get; set; }
 
 		public readonly AppDatabaseContext dbContext;
+        private readonly IUserService userService;
+        public readonly IUserDatabaseService userDatabaseService;
 
-        public DatabaseEditor(AppDatabaseContext dbContext)
+        public DatabaseEditor(AppDatabaseContext dbContext, IUserService userService, IUserDatabaseService userDatabaseService)
         {
             this.dbContext = dbContext;
+            this.userService = userService;
+            this.userDatabaseService = userDatabaseService;
         }
 
-        public IActionResult OnGet(int databaseID)
+        public async Task<IActionResult> OnGetAsync(int databaseID)
         {
-			var result = InitializeEditor(databaseID);
+			var result = await InitializeEditorAsync(databaseID);
 
 			if (result != null) return result; // Return the page result if it doesn't return null
 
 			return Page();
         }
 
-		public string GetIssuerFullName(int userID)
+		public async Task<string> GetIssuerFullNameAsync(int userID)
 		{
-			var issuingUser = dbContext.Users.Where(u => u.ID == userID).FirstOrDefault();
+			var issuingUser = await dbContext.Users.Where(u => u.ID == userID).FirstOrDefaultAsync();
 			return $"{issuingUser.FirstName} {issuingUser.LastName}";
 		}
 
 
-        // Handler for adding merit
-        public IActionResult OnPostAddMerit(int databaseID)
+        // Handler end point for adding merit
+        public async Task<IActionResult> OnPostAddMeritAsync(int databaseID)
         {
-			var result = InitializeEditor(databaseID);
+			var result = await InitializeEditorAsync(databaseID);
 
 			if (result != null) return result; // Return the page result if it doesn't return null
 
-			// Add to database
-			dbContext.Merits.Add(new MeritModel()
-            {
-                StudentName = MeritStudentName.Trim(), // Trimming leading and following spaces for names
-                HousePoints = MeritHousePoints,
-                Value = MeritValue,
-                DateOfIssue = DateTime.Now,
-                IssuerID = CurrentUser.ID,
-                DatabaseID = CurrentDatabase.DatabaseID,
-                IssuerName = GetIssuerFullName(CurrentUser.ID),
-            });
-
-            dbContext.SaveChanges();
-			MeritRecords = dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToList();
+            // Add to database and get the updated database list
+            MeritRecords = await userDatabaseService.AddRecordToDatabaseAsync(
+                MeritStudentName,
+                MeritHousePoints,
+                MeritValue,
+                CurrentUser.ID,
+                await GetIssuerFullNameAsync(CurrentUser.ID),
+                CurrentDatabase,
+                dbContext);
 
             return Partial("_DatabaseList", MeritRecords);
         }
 
-        // Handler for editing merit
-        public IActionResult OnPostEditMerit(int databaseID)
+        // Handler end point for editing merit
+        public async Task<IActionResult> OnPostEditMeritAsync(int databaseID)
         {
-            var result = InitializeEditor(databaseID);
+            var result = await InitializeEditorAsync(databaseID);
 
             if (result != null) return result; // Return the page result if it doesn't return null
 
-            // Get merit from database
-            MeritModel merit = dbContext.Merits.Where(m => m.Id == MeritID).FirstOrDefault();
-            if (merit == null) return StatusCode(500);
+            // Edit selected merit record through its id. It returns either null or the updated merit list
+            var editResult = await userDatabaseService.EditRecordInDatabaseAsync(MeritStudentName,
+                MeritValue,
+                MeritHousePoints,
+                MeritID,
+                CurrentDatabase,
+                dbContext);
 
-            // Edit properties of record to form inputs
-            merit.StudentName = MeritStudentName.Trim(); // Trimming leading and following spaces
-            merit.Value = MeritValue;
-            merit.HousePoints = MeritHousePoints;
-
-			dbContext.SaveChanges();
-			MeritRecords = dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToList();
+            if (editResult == null) return StatusCode(400); // Failed edit if it returns null
+            MeritRecords = editResult;
 
 			return Partial("_DatabaseList", MeritRecords);
 		}
 
-
-
-        // Method to initialize all properties in this model
-        public IActionResult InitializeEditor(int databaseID)
+        // Handler end point for deleting merit models
+        public async Task<IActionResult> OnPostDeleteMeritAsync(int databaseID, int meritId)
         {
-			var user = HelperMethods.GetCurrentUser(HttpContext, dbContext);
+
+			var result = await InitializeEditorAsync(databaseID);
+
+			if (result != null) return result; // Return the page result if it doesn't return null
+
+			var deleteResult = await userDatabaseService.DeleteRecordFromDatabaseAsync(meritId, dbContext, CurrentDatabase);
+
+			if (deleteResult == null) return StatusCode(400); // Failed edit if it returns null
+			MeritRecords = deleteResult;
+
+			return Partial("_DatabaseList", MeritRecords);
+
+		}
+
+
+		// Method to initialize all properties in this model
+		public async Task<IActionResult> InitializeEditorAsync(int databaseID)
+        {
+			var user = await userService.GetCurrentUserAsync(HttpContext, dbContext);
 			if (user == null) return RedirectToPage("/Login"); // Return to login if current user is null or invalid
 			CurrentUser = user;
 
 			// Get the database matching the ID and user
-			CurrentDatabase = HelperMethods.GetDatabase(databaseID, CurrentUser, dbContext);
+			CurrentDatabase = await userDatabaseService.GetDatabaseAsync(databaseID, user, dbContext);
 
 			if (CurrentDatabase == null) return RedirectToPage("/Dashboard"); // If database doesn't belong to user, redirect back to dashboard
+
 			// Get all merit records from the database
-			MeritRecords = dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToList();
+			MeritRecords = await dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToListAsync();
 
             return null;
 		}
+
 
 	}
 }

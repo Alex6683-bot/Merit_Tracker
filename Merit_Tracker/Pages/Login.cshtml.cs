@@ -1,4 +1,5 @@
 using Merit_Tracker.Database;
+using Merit_Tracker.Interfaces;
 using Merit_Tracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -18,32 +19,26 @@ namespace Merit_Tracker.Pages
 
         private readonly ILogger<IndexModel> _logger;
         private readonly AppDatabaseContext dbContext;
+        private readonly IUserService userService;
 
-        public LoginModel(AppDatabaseContext dbContext)
+        public LoginModel(AppDatabaseContext dbContext, IUserService userServie)
         {
             this.dbContext = dbContext;
+            this.userService = userServie;
         }
         public void OnGet()
         {
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
-            SHA256 sha256 = SHA256.Create();
-            string hashedPassword = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(Password)));
-            sha256.Dispose();
+            var user = await userService.RegisterUserSessionAsync(HttpContext, dbContext, Username, Password); // Get current user after registering to session with user service
 
-            UserModel user = dbContext.Users.Where(u => u.UserName == Username).ToList().FirstOrDefault();
-
-            if (user != null && user.Password == hashedPassword)
+            if (user != null)
             {
-                HttpContext.Session.Clear();
-                HttpContext.Session.SetInt32("UserID", user.ID);
-                HttpContext.Session.SetInt32("Role", (int)user.Role);
-
-                if (user.Role == UserRole.Admin || user.Role == UserRole.Teacher)
-                    return new JsonResult(new { url = Url.Page("Dashboard") });
-            }
+				if (user.Role == UserRole.Admin || user.Role == UserRole.Teacher)
+					return new JsonResult(new { url = Url.Page("Dashboard") });
+			}
 
             return new ContentResult()
             {

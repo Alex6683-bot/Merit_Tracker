@@ -5,32 +5,30 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Merit_Tracker.Interfaces;
 
 namespace Merit_Tracker.Pages
 {
     public class IndexModel : PageModel
     {
+		private readonly AppDatabaseContext dbContext;
+		private readonly IUserService userService;
 
-
-        public IActionResult OnGet()
+		public IndexModel(AppDatabaseContext dbContext, IUserService userServie)
+		{
+			this.dbContext = dbContext;
+			this.userService = userServie;
+		}
+		public async Task<IActionResult> OnGetAsync()
         {
-            if (HttpContext.Session != null || HttpContext.Session.Keys.Count() > 0)
+            var currentUser = await userService.GetCurrentUserAsync(HttpContext, dbContext);
+            if (currentUser != null)
             {
-                HttpContext.Session.TryGetValue("UserID", out byte[] id);
-                HttpContext.Session.TryGetValue("Role", out byte[] role);
-
-                if (id == null || role == null) return RedirectToPage("Login");
-
-                if (BitConverter.IsLittleEndian)
+                if (currentUser.Role == UserRole.Admin || currentUser.Role == UserRole.Teacher)
                 {
-                    Array.Reverse(id);
-                    Array.Reverse(role);
+                    return RedirectToPage("Dashboard");
                 }
-
-                UserRole roleConverted = (UserRole)BitConverter.ToInt32(role);
-
-                if (roleConverted == UserRole.Admin || roleConverted == UserRole.Teacher) return RedirectToPage("Dashboard");
-
+                else return RedirectToPage("Login");
             }
             return RedirectToPage("Login");
         }

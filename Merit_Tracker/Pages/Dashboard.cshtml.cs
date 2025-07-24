@@ -11,14 +11,16 @@ namespace Merit_Tracker.Pages
     {
         public UserModel CurrentUser { get; set; }
         public readonly AppDatabaseContext dbContext;
+        private readonly IUserService userService;
 
-        public DashboardModel(AppDatabaseContext dbContext)
+        public DashboardModel(AppDatabaseContext dbContext, IUserService userService)
         {
             this.dbContext = dbContext;
+            this.userService = userService;
         }
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
-			var user = HelperMethods.GetCurrentUser(HttpContext, dbContext);
+			var user = await userService.GetCurrentUserAsync(HttpContext, dbContext);
 			if (user == null) return RedirectToPage("/Login"); // Return to login if current user is null or invalid
 
             CurrentUser = user;

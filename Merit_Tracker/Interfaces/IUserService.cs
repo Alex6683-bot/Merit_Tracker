@@ -1,11 +1,11 @@
-﻿using Merit_Tracker.Models;
+﻿using Merit_Tracker.Database;
+using Merit_Tracker.Models;
 
 namespace Merit_Tracker.Interfaces
 {
 	public interface IUserService
 	{
-		public UserModel CurrentUser { get; set; }
-		public UserModel GetCurrentUser(HttpContext httpContext);
-		public UserModel RegisterUserSession(HttpContext httpContext);
+		public Task<UserModel> GetCurrentUserAsync(HttpContext httpContext, AppDatabaseContext dbContext);
+		public Task<UserModel> RegisterUserSessionAsync(HttpContext httpContext, AppDatabaseContext dbContext, string userName, string password);
 	}
 }

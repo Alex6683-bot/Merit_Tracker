@@ -5,6 +5,7 @@ const deleteButton = document.querySelector('.delete-button');
 bindRadioListeners();
 updateButtonState();
 
+// Binding listeners to each radio boxes
 function bindRadioListeners() {
     const radioCheckBoxes = document.querySelectorAll('.merit-view-radio');
     radioCheckBoxes.forEach((radioCheckBox) => {
@@ -77,7 +78,7 @@ function showFeedbackModal(isSuccess, message) {
 const meritModal = document.getElementById('merit-record-modal');
 const meritModalInstance = bootstrap.Modal.getOrCreateInstance(meritModal);
 
-// AJAX request for add merit
+// AJAX request for add & edit merit
 meritForm.addEventListener('submit', function (event) {
 
     // Validate the form
@@ -106,10 +107,12 @@ meritForm.addEventListener('submit', function (event) {
             showFeedbackModal(false, "Failed to register merit");
 
         }).then(responseHtml => {
-            const meritList = document.querySelector('.merit-list');
-            meritList.innerHTML = responseHtml;
-            bindRadioListeners();
-            updateButtonState();
+            if (responseHtml) {
+                const meritList = document.querySelector('.merit-list');
+                meritList.innerHTML = responseHtml;
+                bindRadioListeners();
+                updateButtonState();
+            }
         });
     }
     // Resquest to edit merit handler
@@ -126,21 +129,55 @@ meritForm.addEventListener('submit', function (event) {
             showFeedbackModal(false, "Failed to edit merit");
 
         }).then(responseHtml => {
+            if (responseHtml) {
+                const meritList = document.querySelector('.merit-list');
+                meritList.innerHTML = responseHtml;
+                bindRadioListeners();
+                updateButtonState();
+            }
+        });
+    }
+
+});
+
+const deleteModal = new bootstrap.Modal(document.getElementById('delete-confirmation-modal'));
+
+// AJAX request for delete merit
+deleteButton.addEventListener('click', () => {
+    deleteModal.show();
+
+});
+
+const confirmDeleteButton = document.querySelector('#confirmDelete');
+
+confirmDeleteButton.addEventListener('click', () => {
+    let selectedRadio = document.querySelector('input[name="merit-select-radio"]:checked');
+    const meritRecord = selectedRadio.closest('.merit-view'); // Get merit view/record from the selected radio
+    const meritId = meritRecord.getAttribute('data-merit-id');
+
+    const formData = new FormData();
+    formData.append('MeritID', meritId);
+
+    fetch('?handler=DeleteMerit', {
+        method: 'post',
+        headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() }, // Fix anti forgery issues
+        body: formData
+    }).then(response => {
+        deleteModal.hide();
+        if (response.ok) {
+            showFeedbackModal(true, "Merit deleted successfully");
+            return response.text();
+        }
+        showFeedbackModal(false, "Failed to delete merit");
+    }).then(responseHtml => {
+        if (responseHtml) {
             const meritList = document.querySelector('.merit-list');
             meritList.innerHTML = responseHtml;
             bindRadioListeners();
             updateButtonState();
-        });
-    }
-
-    
+        }
+    })
 });
-
-
-// Handle Delete Button
-deleteButton.addEventListener('click', () => {
-
-})
 
 
 

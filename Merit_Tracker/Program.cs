@@ -1,6 +1,8 @@
 using Merit_Tracker.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore;
+using Merit_Tracker.Interfaces;
+using Merit_Tracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,8 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserDatabaseService, UserMeritDatabaseService>();
 
 
 var app = builder.Build();
