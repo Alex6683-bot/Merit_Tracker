@@ -2,6 +2,7 @@
 
 namespace Merit_Tracker.Classes
 {
+	// This class is used to represent a filter for the database editor
 	public class DatabaseFilter
 	{
 		public string? StudentNameFilter { get; set; } = "";

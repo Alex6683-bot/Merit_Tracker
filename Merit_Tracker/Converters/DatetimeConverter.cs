@@ -2,6 +2,7 @@
 
 namespace Merit_Tracker.Converters
 {
+    // Converter to convert between utc and local time
     public class DateTimeUtcConverter : ValueConverter<DateTime, DateTime>
     {
         public DateTimeUtcConverter() : base(

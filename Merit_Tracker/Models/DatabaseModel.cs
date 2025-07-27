@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Merit_Tracker.Models
 {
+    // This is the model used to represent databases of users 
     [Table("Databases")]
     public class DatabaseModel
     {

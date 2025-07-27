@@ -11,28 +11,35 @@ namespace Merit_Tracker.Pages
 {
     public class IndexModel : PageModel
     {
-		private readonly AppDatabaseContext dbContext;
-		private readonly IUserService userService;
+        // Database context for querying users
+        private readonly AppDatabaseContext dbContext;
 
-		public IndexModel(AppDatabaseContext dbContext, IUserService userServie)
-		{
-			this.dbContext = dbContext;
-			this.userService = userServie;
-		}
-		public async Task<IActionResult> OnGetAsync()
+        // Service for user-related logic (e.g., getting current logged-in user)
+        private readonly IUserService userService;
+
+        public IndexModel(AppDatabaseContext dbContext, IUserService userServie)
         {
+            this.dbContext = dbContext;
+            this.userService = userServie;
+        }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            // Attempt to fetch the current logged-in user via cookies/session
             var currentUser = await userService.GetCurrentUserAsync(HttpContext, dbContext);
+
+            // Redirect based on role
             if (currentUser != null)
             {
                 if (currentUser.Role == UserRole.Admin || currentUser.Role == UserRole.Teacher)
                 {
                     return RedirectToPage("Dashboard");
                 }
-                else return RedirectToPage("Login");
+                else return RedirectToPage("Login"); // User exists but isn't valid (e.g., not an Admin/Teacher)
             }
+
+            // If no user is logged in, redirect to login
             return RedirectToPage("Login");
         }
-
-
     }
 }

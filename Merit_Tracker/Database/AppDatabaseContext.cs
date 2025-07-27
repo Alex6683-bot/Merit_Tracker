@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Merit_Tracker.Database
 {
+    // This is the database context which represents the whole database and its related tables, etc.
     public class AppDatabaseContext : DbContext
     {
         public AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : base(options)

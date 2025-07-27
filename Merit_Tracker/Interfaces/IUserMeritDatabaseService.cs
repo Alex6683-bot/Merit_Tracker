@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Merit_Tracker.Interfaces
 {
+	// Interface used to implement servies that handle merit database
 	public interface IUserMeritDatabaseService
 	{
 		public bool IsFiltered { get; set; }
