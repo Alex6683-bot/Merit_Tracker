@@ -256,3 +256,40 @@ input[type="radio"]:checked {
 .feedback-failure {
     background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
+.merit-modal-filter-button:disabled {
+    background: linear-gradient(135deg, #a3a3c2, #bdbddf);
+    color: #eeeeee;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+
+.filter-indicator {
+    align-self: flex-start;
+    background-color: #bdc3c7;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: 'Segoe UI';
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    line-height: 1;
+}
+
+.filter-close-btn:hover {
+    color: #2c3e50;
+}

@@ -1,6 +1,7 @@
 const addButton = document.querySelector('.add-button');
 const editButton = document.querySelector('.edit-button');
 const deleteButton = document.querySelector('.delete-button');
+const filterButton = document.querySelector('.filter-button');
 
 bindRadioListeners();
 updateButtonState();
@@ -142,7 +143,6 @@ meritForm.addEventListener('submit', function (event) {
 
 const deleteModal = new bootstrap.Modal(document.getElementById('delete-confirmation-modal'));
 
-// AJAX request for delete merit
 deleteButton.addEventListener('click', () => {
     deleteModal.show();
 
@@ -150,6 +150,7 @@ deleteButton.addEventListener('click', () => {
 
 const confirmDeleteButton = document.querySelector('#confirmDelete');
 
+// AJAX request for delete merit
 confirmDeleteButton.addEventListener('click', () => {
     let selectedRadio = document.querySelector('input[name="merit-select-radio"]:checked');
     const meritRecord = selectedRadio.closest('.merit-view'); // Get merit view/record from the selected radio
@@ -179,7 +180,107 @@ confirmDeleteButton.addEventListener('click', () => {
     })
 });
 
+// Show filter modal on click
+const filterModal = new bootstrap.Modal(document.getElementById('merit-filter-modal'));
+filterButton.addEventListener('click', () => {
+    filterModal.show();
+});
 
+const filterStudentName = document.getElementById('filterStudentName');
+const filterIssuerName = document.getElementById('filterIssuerName');
+const filterMeritValue = document.getElementById('filterMeritValue');
+const filterStartDate = document.getElementById('filterStartDate');
+const filterEndDate = document.getElementById('filterEndDate');
+
+const filterSubmitButton = document.querySelector('.merit-modal-filter-button');
+
+const filterForm = document.querySelector('.filter-form');
+
+function validateFilterInputs() {
+    let hasAnyFilters = !(filterStudentName.value == "" &&
+        filterIssuerName.value == "" &&
+        parseInt(filterMeritValue.value, 0) == 0 &&
+        filterStartDate.valueAsDate == null &&
+        filterEndDate.valueAsDate == null
+    );
+
+    // Validate Dates
+    const hasValidDateRange =
+        (filterStartDate.valueAsDate && !filterEndDate.valueAsDate) ||
+        (!filterStartDate.valueAsDate && filterEndDate.valueAsDate) ||
+        (!filterStartDate.valueAsDate && !filterEndDate.valueAsDate && hasAnyFilters) || 
+        (filterStartDate.valueAsDate && filterEndDate.valueAsDate && filterStartDate.valueAsDate <= filterEndDate.valueAsDate);
+
+    filterSubmitButton.disabled = !(hasAnyFilters && hasValidDateRange);
+}
+
+validateFilterInputs();
+
+// Validation
+filterForm.querySelectorAll('input, select').forEach(input => {
+    input.addEventListener('change', () => {
+        validateFilterInputs();
+    })
+})
+
+// AJAX request for filter
+filterForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Filter object
+    let filterData = {
+        StudentNameFilter: filterStudentName.value.trim(),
+        IssuerNameFilter: filterIssuerName.value.trim(),
+        MeritValueFilter: parseInt(filterMeritValue.value, 0),
+        MeritStartDateFilter: filterStartDate.valueAsDate,
+        MeritEndDateFilter: filterEndDate.valueAsDate
+    };
+
+    fetch('?handler=FilterMerit', {
+        method: 'post',
+        headers: {
+            "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val(),  // Fix anti forgery issues
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filterData)
+    }).then(response => {
+        if (response.ok) {
+            return response.text();
+        }
+    }).then(responseHtml => {
+        if (responseHtml) {
+            filterModal.hide();
+            const meritList = document.querySelector('.merit-list');
+            meritList.innerHTML = responseHtml;
+            bindRadioListeners();
+            updateButtonState();
+        }
+    })
+})
+
+function removeFilter() {
+    fetch('?handler=RemoveFilter', {
+        method: 'post',
+        headers: {
+            "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val(),  // Fix anti forgery issues
+            'Content-Type': 'application/json'
+        },
+        body: null
+    }).then(response => {
+        if (response.ok) {
+            return response.text();
+        }
+    }).then(responseHtml => {
+        if (responseHtml) {
+            filterForm.reset();
+            filterModal.hide();
+            const meritList = document.querySelector('.merit-list');
+            meritList.innerHTML = responseHtml;
+            bindRadioListeners();
+            updateButtonState();
+        }
+    })
+};
 
 
 

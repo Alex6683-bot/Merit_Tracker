@@ -1,13 +1,20 @@
-﻿using Merit_Tracker.Database;
+﻿using Merit_Tracker.Classes;
+using Merit_Tracker.Database;
 using Merit_Tracker.Interfaces;
 using Merit_Tracker.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Merit_Tracker.Services
 {
-	public class UserMeritDatabaseService : IUserDatabaseService
+	public class UserMeritDatabaseService : IUserMeritDatabaseService
 	{
+		public bool IsFiltered { get; set; } = false;
+		public DatabaseFilter DatabaseFilter { get; set; } = new DatabaseFilter();
+
+
 		public async Task<List<MeritModel>> AddRecordToDatabaseAsync(
 			string meritStudentName,
 			int meritHousePoints,
@@ -65,6 +72,31 @@ namespace Merit_Tracker.Services
 			await dbContext.SaveChangesAsync();
 
 			return await dbContext.Merits.Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID).ToListAsync();
+
+		}
+
+		public async Task<List<MeritModel>> FilterMeritDatabaseAsync(DatabaseFilter filter, AppDatabaseContext dbContext, DatabaseModel currentDatabaseModel)
+		{
+			var query = dbContext.Merits.AsQueryable();
+
+			query = query.Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID);
+
+			if (!string.IsNullOrWhiteSpace(filter.StudentNameFilter))
+				query = query.Where(m => m.StudentName.Contains(filter.StudentNameFilter));
+
+			if (!string.IsNullOrWhiteSpace(filter.IssuerNameFilter))
+				query = query.Where(m => m.IssuerName.Contains(filter.IssuerNameFilter));
+
+			if (filter.MeritValueFilter > 0)
+				query = query.Where(m => m.Value == (MeritValue)filter.MeritValueFilter);
+
+			if (filter.MeritStartDateFilter.HasValue)
+				query = query.Where(m => m.DateOfIssue >= filter.MeritStartDateFilter.Value.ToUniversalTime());
+
+			if (filter.MeritEndDateFilter.HasValue)
+				query = query.Where(m => m.DateOfIssue <= filter.MeritEndDateFilter.Value.ToUniversalTime());
+
+			return await query.ToListAsync();
 
 		}
 	}

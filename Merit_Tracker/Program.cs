@@ -19,7 +19,7 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserDatabaseService, UserMeritDatabaseService>();
+builder.Services.AddScoped<IUserMeritDatabaseService, UserMeritDatabaseService>();
 
 
 var app = builder.Build();

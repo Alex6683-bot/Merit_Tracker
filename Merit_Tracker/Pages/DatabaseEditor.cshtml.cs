@@ -1,3 +1,4 @@
+using Merit_Tracker.Classes;
 using Merit_Tracker.Database;
 using Merit_Tracker.Helpers;
 using Merit_Tracker.Interfaces;
@@ -5,6 +6,8 @@ using Merit_Tracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Json;
 
 namespace Merit_Tracker.Pages
 {
@@ -27,9 +30,9 @@ namespace Merit_Tracker.Pages
 
 		public readonly AppDatabaseContext dbContext;
         private readonly IUserService userService;
-        public readonly IUserDatabaseService userDatabaseService;
+        public readonly IUserMeritDatabaseService userDatabaseService;
 
-        public DatabaseEditor(AppDatabaseContext dbContext, IUserService userService, IUserDatabaseService userDatabaseService)
+        public DatabaseEditor(AppDatabaseContext dbContext, IUserService userService, IUserMeritDatabaseService userDatabaseService)
         {
             this.dbContext = dbContext;
             this.userService = userService;
@@ -69,7 +72,7 @@ namespace Merit_Tracker.Pages
                 CurrentDatabase,
                 dbContext);
 
-            return Partial("_DatabaseList", MeritRecords);
+            return Partial("_DatabaseList", this);
         }
 
         // Handler end point for editing merit
@@ -90,15 +93,14 @@ namespace Merit_Tracker.Pages
             if (editResult == null) return StatusCode(400); // Failed edit if it returns null
             MeritRecords = editResult;
 
-			return Partial("_DatabaseList", MeritRecords);
+			return Partial("_DatabaseList", this);
+
 		}
 
-        // Handler end point for deleting merit models
-        public async Task<IActionResult> OnPostDeleteMeritAsync(int databaseID, int meritId)
+		// Handler end point for deleting merit models
+		public async Task<IActionResult> OnPostDeleteMeritAsync(int databaseID, int meritId)
         {
-
 			var result = await InitializeEditorAsync(databaseID);
-
 			if (result != null) return result; // Return the page result if it doesn't return null
 
 			var deleteResult = await userDatabaseService.DeleteRecordFromDatabaseAsync(meritId, dbContext, CurrentDatabase);
@@ -106,8 +108,48 @@ namespace Merit_Tracker.Pages
 			if (deleteResult == null) return StatusCode(400); // Failed edit if it returns null
 			MeritRecords = deleteResult;
 
-			return Partial("_DatabaseList", MeritRecords);
+			return Partial("_DatabaseList", this);
 
+		}
+
+		// Handler end point for filtering merit records
+		public async Task<IActionResult> OnPostFilterMeritAsync(int databaseID, int meritID)
+        {
+			var result = await InitializeEditorAsync(databaseID);
+			if (result != null) return result; // Return the page result if it doesn't return null
+
+            // Get raw json
+            DatabaseFilter? databaseFilter;
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                string json = await reader.ReadToEndAsync();
+                databaseFilter =  JsonSerializer.Deserialize<DatabaseFilter>(json);
+            }
+
+            if (databaseFilter == null) return Partial("_DatabaseList", this);
+            userDatabaseService.IsFiltered = true;
+			userDatabaseService.DatabaseFilter = databaseFilter;
+
+            var filterResult = await userDatabaseService.FilterMeritDatabaseAsync(databaseFilter, dbContext, CurrentDatabase);
+            if (filterResult == null) return Partial("_DatabaseList", this);
+
+            MeritRecords = filterResult;
+
+			return Partial("_DatabaseList", this);
+
+		}
+
+        // Handlet end point for removing filter
+        public async Task<IActionResult> OnPostRemoveFilterAsync(int databaseID, int meritID)
+        {
+			var result = await InitializeEditorAsync(databaseID);
+			if (result != null) return result; // Return the page result if it doesn't return null
+
+            userDatabaseService.IsFiltered = false;
+            // Set filter values to an empty object
+            userDatabaseService.DatabaseFilter = new DatabaseFilter();
+
+			return Partial("_DatabaseList", this);
 		}
 
 

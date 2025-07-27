@@ -1,4 +1,5 @@
 ﻿@page "{databaseID}"
+@using Merit_Tracker.Models;
 @model Merit_Tracker.Pages.DatabaseEditor
 @{
 }
@@ -25,16 +26,14 @@
 								<button class="crud-button add-button" data-bs-toggle="modal" data-bs-target="#merit-record-modal"><img width="19" src="~/media/icons/plus.png" style="vertical-align: -2px"/></button>
 								<button class="crud-button edit-button" data-bs-toggle="modal" data-bs-target="#merit-record-modal"><img width="19" src="~/media/icons/edit.png" style="vertical-align: -1px"/></button>
 								<button class="crud-button delete-button"><img width="23" src="~/media/icons/delete.png" style="vertical-align: -3px"/></button>
-								<button class="crud-button filter-button" data-bs-toggle="modal" data-bs-target="#merit-filter-modal"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
+								<button class="crud-button filter-button"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
 							</div>
 						</div>
 					</div>
 					<div class="row g-0">
 						<div class="database-list col">
 							<form class="merit-list-input">
-								<ul class="merit-list">
-									<partial name="_DatabaseList" model="Model.MeritRecords"/>
-								</ul>
+								<partial name="_DatabaseList" model="Model" />
 							</form>
 						</div>
 					</div>
@@ -97,22 +96,45 @@
 						<div class="modal-body">
 							<form class="filter-form">
 								<div class="mb-3">
-									<label class="form-label fw-bold text-dark" for="filterValue">Value:</label>
-									<select id="filterValue" class="form-select merit-input">
-										<option disabled selected hidden>Select Value</option>
-										<option>Resilience</option>
-										<option>Respect</option>
-										<option>Responsibility</option>
-										<option>Endeavour</option>
-									</select>
+									<label class="form-label fw-bold text-dark" for="filterStudentName">Student Name:</label>
+									<input type="text" id="filterStudentName" class="form-control merit-input" placeholder="Enter student name" value="@Model.userDatabaseService.DatabaseFilter.StudentNameFilter"/>
 								</div>
 								<div class="mb-3">
-									<label class="form-label fw-bold text-dark" for="filterStartDate">Start Date:</label>
-									<input type="date" id="filterStartDate" class="form-control merit-input" />
+									<label class="form-label fw-bold text-dark" for="filterIssuerName">Issuer Name:</label>
+									<input type="text" id="filterIssuerName" class="form-control merit-input" placeholder="Enter issuer name" value="@Model.userDatabaseService.DatabaseFilter.IssuerNameFilter"/>
+								</div>
+								<div class="mb-3">
+									<label class="form-label fw-bold text-dark" for="filterMeritValue">Merit Value:</label>
+									<select id="filterMeritValue" class="form-select merit-input filterMeritValue">
+										<option value="0">None</option>
+										@{
+											foreach (MeritValue meritValue in Enum.GetValues(typeof(Merit_Tracker.Models.MeritValue))) 
+											{
+												if (Model.userDatabaseService.DatabaseFilter.MeritValueFilter != null)
+												{
+													if (meritValue == (MeritValue)Model.userDatabaseService.DatabaseFilter.MeritValueFilter) { <option value="@((int)meritValue)">@meritValue</option> }
+												}
+												else{
+													<option value="@((int)meritValue)">@meritValue</option> 
+												}
+											}
+										}
+									}
+								</select>
+							</div>
+							<div class="mb-3">
+								<label class="form-label fw-bold text-dark" for="filterStartDate">Start Date:</label>
+								@{
+									var startDate = Model.userDatabaseService.DatabaseFilter.MeritStartDateFilter;
+									<input type="date" id="filterStartDate" class="form-control merit-input" value="@(startDate == null ? "" : startDate.Value.ToLocalTime().ToString("dd/MM/yyyy"))" />
+								}
 								</div>
 								<div class="mb-4">
 									<label class="form-label fw-bold text-dark" for="filterEndDate">End Date:</label>
-									<input type="date" id="filterEndDate" class="form-control merit-input" />
+									@{
+										var endDate = Model.userDatabaseService.DatabaseFilter.MeritEndDateFilter;
+									<input type="date" id="filterEndDate" class="form-control merit-input" value="@(endDate == null ? "" : endDate.Value.ToLocalTime().ToString("dd/MM/yyyy"))" />
+									}
 								</div>
 								<div class="d-grid">
 									<button type="submit" class="btn btn-primary btn-gradient text-white fw-bold rounded-pill merit-modal-filter-button">Apply Filter</button>
@@ -122,6 +144,7 @@
 					</div>
 				</div>
 			</div>
+
 
 			<!--Feedback Modal-->
 			<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">

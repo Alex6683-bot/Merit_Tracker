@@ -1,24 +1,33 @@
 ﻿@using Merit_Tracker.Models
-@model List<MeritModel>
+@model DatabaseEditor
 @{
 }
 
-@foreach (var meritRecord in Model)
-{
-	<li class="merit-view" data-merit-id="@meritRecord.Id" data-student-name="@meritRecord.StudentName" data-date="@meritRecord.DateOfIssue.Date.ToString("yyyy-MM-dd")" data-value="@((int)meritRecord.Value)" data-house-points="@meritRecord.HousePoints">
-		<label class="merit-view-label">
-			<input type="radio" name="merit-select-radio" class="merit-view-radio form-check-input" />
-			<div class="merit-view-container">
-				<div class="merit-main-details">
-					<div class="merit-view-name">@meritRecord.StudentName</div>
-					<div class="merit-view-date">@meritRecord.DateOfIssue.ToLocalTime().ToString("dd/MM/yyyy")</div>
+<ul class="merit-list">
+	@if (Model.userDatabaseService.IsFiltered)
+	{
+		<div class="filter-indicator">
+			Filtered
+			<button type="button" class="filter-close-btn" title="Remove Filter" onclick="removeFilter()">✖</button>
+		</div>
+	}
+	@foreach (var meritRecord in Model.MeritRecords)
+	{
+		<li class="merit-view" data-merit-id="@meritRecord.Id" data-student-name="@meritRecord.StudentName" data-date="@meritRecord.DateOfIssue.Date.ToString("yyyy-MM-dd")" data-value="@((int)meritRecord.Value)" data-house-points="@meritRecord.HousePoints">
+			<label class="merit-view-label">
+				<input type="radio" name="merit-select-radio" class="merit-view-radio form-check-input" />
+				<div class="merit-view-container">
+					<div class="merit-main-details">
+						<div class="merit-view-name">@meritRecord.StudentName</div>
+						<div class="merit-view-date">@meritRecord.DateOfIssue.ToLocalTime().ToString("dd/MM/yyyy")</div>
+					</div>
+					<div class="merit-view-misc-details">
+						<div class="value misc-detail">Value: <span>@meritRecord.Value</span></div>
+						<div class="house-points misc-detail">House Points: <span>@meritRecord.HousePoints</span></div>
+						<div class="issued-by misc-detail">Issued by: <span>@meritRecord.IssuerName</span></div>
+					</div>
 				</div>
-				<div class="merit-view-misc-details">
-					<div class="value misc-detail">Value: <span>@meritRecord.Value</span></div>
-					<div class="house-points misc-detail">House Points: <span>@meritRecord.HousePoints</span></div>
-					<div class="issued-by misc-detail">Issued by: <span>@meritRecord.IssuerName</span></div>
-				</div>
-			</div>
-		</label>
-	</li>
-}
+			</label>
+		</li>
+	}
+</ul>
