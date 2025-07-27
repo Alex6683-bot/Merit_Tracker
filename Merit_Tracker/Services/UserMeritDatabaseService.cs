@@ -15,44 +15,65 @@ namespace Merit_Tracker.Services
 		public DatabaseFilter DatabaseFilter { get; set; } = new DatabaseFilter();
 
 
-		public async Task<List<MeritModel>> AddRecordToDatabaseAsync(
-			string meritStudentName,
-			int meritHousePoints,
-			MeritValue meritValue,
-			int meritIssuerID,
-			string meritIssuerName,
-			DatabaseModel currentDatabaseModel,
-			AppDatabaseContext dbContext
-		)
-		{
-			dbContext.Merits.Add(new MeritModel()
-			{
-				StudentName = meritStudentName.Trim(), // Trimming leading and following spaces for names
-				HousePoints = meritHousePoints,
-				Value = meritValue,
-				DateOfIssue = DateTime.Now,
-				IssuerID = meritIssuerID,
-				DatabaseID = currentDatabaseModel.DatabaseID,
-				IssuerName = meritIssuerName.Trim()
-			});
-			await dbContext.SaveChangesAsync();
-			return await dbContext.Merits.Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID).ToListAsync();
-		}
+        public async Task<List<MeritModel>?> AddRecordToDatabaseAsync(
+            string meritStudentName,
+            int meritHousePoints,
+            MeritValue meritValue,
+            int meritIssuerID,
+            string meritIssuerName,
+            DatabaseModel currentDatabaseModel,
+            AppDatabaseContext dbContext
+        )
+        {
+            // Null or invalid check
+            if (string.IsNullOrWhiteSpace(meritStudentName) ||
+                string.IsNullOrWhiteSpace(meritIssuerName) ||
+                currentDatabaseModel == null ||
+                dbContext == null ||
+                meritHousePoints < 0 ||
+                meritIssuerID <= 0)
+            {
+                return null;
+            }
 
-		public async Task<List<MeritModel>> EditRecordInDatabaseAsync(string meritStudentName, MeritValue meritValue, int meritHousePoints,
+            dbContext.Merits.Add(new MeritModel()
+            {
+                StudentName = meritStudentName.Trim(),
+                HousePoints = meritHousePoints,
+                Value = meritValue,
+                DateOfIssue = DateTime.UtcNow,
+                IssuerID = meritIssuerID,
+                DatabaseID = currentDatabaseModel.DatabaseID,
+                IssuerName = meritIssuerName.Trim()
+            });
+
+            await dbContext.SaveChangesAsync();
+
+            return await dbContext.Merits
+                .Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID)
+                .ToListAsync();
+        }
+
+
+
+        public async Task<List<MeritModel>> EditRecordInDatabaseAsync(string meritStudentName, MeritValue meritValue, int meritHousePoints,
 			int meritID, DatabaseModel currentDatabaseModel, AppDatabaseContext dbContext)
 		{
 			// Get merit from database
 			MeritModel merit = await dbContext.Merits.Where(m => m.Id == meritID).FirstOrDefaultAsync();
 			if (merit == null) return null;
 
-			// Edit properties of record to given values
-			merit.StudentName = meritStudentName.Trim(); // Trimming leading and following spaces
-			merit.Value = meritValue;
-			merit.HousePoints = meritHousePoints;
+			if (!string.IsNullOrWhiteSpace(meritStudentName) && meritHousePoints != null && meritValue != null && meritHousePoints >= 0)
+			{
+				// Edit properties of record to given values
+				merit.StudentName = meritStudentName.Trim(); // Trimming leading and following spaces
+				merit.Value = meritValue;
+				merit.HousePoints = meritHousePoints;
 
-			await dbContext.SaveChangesAsync();
-			return await dbContext.Merits.Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID).ToListAsync();
+				await dbContext.SaveChangesAsync();
+				return await dbContext.Merits.Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID).ToListAsync();
+			}
+			return null;
 		}
 
 		// Get the database matching the ID and user
@@ -66,7 +87,7 @@ namespace Merit_Tracker.Services
 		public async Task<List<MeritModel>> DeleteRecordFromDatabaseAsync(int meritID, AppDatabaseContext dbContext, DatabaseModel currentDatabaseModel)
 		{
 			MeritModel meritModel = await dbContext.Merits.FirstOrDefaultAsync(m => m.Id == meritID);
-			if (meritModel == null) return null;	
+			if (meritModel == null) return null;
 
 			dbContext.Merits.Remove(meritModel);
 			await dbContext.SaveChangesAsync();
@@ -91,10 +112,13 @@ namespace Merit_Tracker.Services
 				query = query.Where(m => m.Value == (MeritValue)filter.MeritValueFilter);
 
 			if (filter.MeritStartDateFilter.HasValue)
-				query = query.Where(m => m.DateOfIssue >= filter.MeritStartDateFilter.Value.ToUniversalTime());
+				query = query.Where(m => m.DateOfIssue >= filter.MeritStartDateFilter.Value.Date.ToUniversalTime());
 
 			if (filter.MeritEndDateFilter.HasValue)
-				query = query.Where(m => m.DateOfIssue <= filter.MeritEndDateFilter.Value.ToUniversalTime());
+			{
+				var endDate = filter.MeritEndDateFilter.Value.Date.AddDays(1).ToUniversalTime();
+				query = query.Where(m => m.DateOfIssue < endDate);
+			}
 
 			return await query.ToListAsync();
 

@@ -16,7 +16,11 @@
             <div class="nav-links">
                 <!--Making the dashboard side button active only if the current page is dashboard-->
                 <a href="/Dashboard" class="nav-item @(ViewData["Title"] == "Dashboard" ? "active" : "")">Dashboard</a> 
-                <a href="#" class="nav-item"><span class="logout-text">Log Out</span></a>
+                <form method="post" action="/Logout" style="margin: 0;">
+                    @Html.AntiForgeryToken()
+                  <button type="submit" class="nav-item logout-text"><span class="logout-text">Log Out</span></button>
+                </form>
+
             </div>
         </div>
     }
@@ -30,4 +34,5 @@
 
         @await RenderSectionAsync("Scripts", required: false)
     </body>
+
 </html>

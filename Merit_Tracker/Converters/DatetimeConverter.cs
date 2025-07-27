@@ -6,7 +6,7 @@ namespace Merit_Tracker.Converters
     {
         public DateTimeUtcConverter() : base(
             d => d.ToUniversalTime(),
-            d => DateTime.SpecifyKind(d, DateTimeKind.Utc).ToLocalTime()
+            d => DateTime.SpecifyKind(d, DateTimeKind.Utc)
         )
         {
 

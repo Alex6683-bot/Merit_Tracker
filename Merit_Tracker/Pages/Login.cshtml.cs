@@ -32,13 +32,16 @@ namespace Merit_Tracker.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await userService.RegisterUserSessionAsync(HttpContext, dbContext, Username, Password); // Get current user after registering to session with user service
-
-            if (user != null)
+            if (string.IsNullOrEmpty(Username) == false && string.IsNullOrEmpty(Password) == false)
             {
-				if (user.Role == UserRole.Admin || user.Role == UserRole.Teacher)
-					return new JsonResult(new { url = Url.Page("Dashboard") });
-			}
+                var user = await userService.RegisterUserSessionAsync(HttpContext, dbContext, Username, Password); // Get current user after registering to session with user service
+
+                if (user != null)
+                {
+                    if (user.Role == UserRole.Admin || user.Role == UserRole.Teacher)
+                        return new JsonResult(new { url = Url.Page("Dashboard") });
+                }
+            }
 
             return new ContentResult()
             {

@@ -23,7 +23,7 @@ namespace Merit_Tracker.Database
 
             modelBuilder.Entity<MeritModel>().
                 Property(m => m.DateOfIssue).
-                HasColumnType("date").
+                HasColumnType("timestamptz").
                 HasConversion<DateTimeUtcConverter>();
         }
     }

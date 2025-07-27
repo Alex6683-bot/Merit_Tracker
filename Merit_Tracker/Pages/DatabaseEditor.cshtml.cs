@@ -6,6 +6,7 @@ using Merit_Tracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Json;
 
@@ -20,12 +21,16 @@ namespace Merit_Tracker.Pages
 
         // Modal Forms
         [BindProperty]
+        [Required]
         public string MeritStudentName { get; set; }
         [BindProperty]
+        [Required]
         public int MeritID { get; set; } // Currently selected merit's id
 		[BindProperty]
-		public MeritValue MeritValue { get; set; }
+        [Required]
+        public MeritValue MeritValue { get; set; }
 		[BindProperty]
+        [Required]
         public int MeritHousePoints { get; set; }
 
 		public readonly AppDatabaseContext dbContext;
@@ -72,6 +77,8 @@ namespace Merit_Tracker.Pages
                 CurrentDatabase,
                 dbContext);
 
+            if (CurrentUser.Role != UserRole.Admin) MeritRecords = MeritRecords.Where(m => m.IssuerID == CurrentUser.ID).ToList();
+
             return Partial("_DatabaseList", this);
         }
 
@@ -82,16 +89,20 @@ namespace Merit_Tracker.Pages
 
             if (result != null) return result; // Return the page result if it doesn't return null
 
-            // Edit selected merit record through its id. It returns either null or the updated merit list
-            var editResult = await userDatabaseService.EditRecordInDatabaseAsync(MeritStudentName,
-                MeritValue,
-                MeritHousePoints,
-                MeritID,
-                CurrentDatabase,
-                dbContext);
+            if (CurrentUser.Role == UserRole.Admin)
+            {
 
-            if (editResult == null) return StatusCode(400); // Failed edit if it returns null
-            MeritRecords = editResult;
+                // Edit selected merit record through its id. It returns either null or the updated merit list
+                var editResult = await userDatabaseService.EditRecordInDatabaseAsync(MeritStudentName,
+                    MeritValue,
+                    MeritHousePoints,
+                    MeritID,
+                    CurrentDatabase,
+                    dbContext);
+
+                if (editResult == null) return StatusCode(400); // Failed edit if it returns null
+                MeritRecords = editResult;
+            }
 
 			return Partial("_DatabaseList", this);
 
@@ -103,28 +114,33 @@ namespace Merit_Tracker.Pages
 			var result = await InitializeEditorAsync(databaseID);
 			if (result != null) return result; // Return the page result if it doesn't return null
 
-			var deleteResult = await userDatabaseService.DeleteRecordFromDatabaseAsync(meritId, dbContext, CurrentDatabase);
+            if (CurrentUser.Role == UserRole.Admin)
+            {
+                var deleteResult = await userDatabaseService.DeleteRecordFromDatabaseAsync(meritId, dbContext, CurrentDatabase);
 
-			if (deleteResult == null) return StatusCode(400); // Failed edit if it returns null
-			MeritRecords = deleteResult;
+                if (deleteResult == null) return StatusCode(400); // Failed edit if it returns null
+                MeritRecords = deleteResult;
+            }
 
 			return Partial("_DatabaseList", this);
 
 		}
 
 		// Handler end point for filtering merit records
-		public async Task<IActionResult> OnPostFilterMeritAsync(int databaseID, int meritID)
+		public async Task<IActionResult> OnPostFilterMeritAsync(int databaseID, int meritID, string? StudentName, string? IssuerName, int? Value, DateTime? StartDate, DateTime? EndDate)
         {
 			var result = await InitializeEditorAsync(databaseID);
 			if (result != null) return result; // Return the page result if it doesn't return null
 
-            // Get raw json
-            DatabaseFilter? databaseFilter;
-            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+
+            DatabaseFilter? databaseFilter = new DatabaseFilter()
             {
-                string json = await reader.ReadToEndAsync();
-                databaseFilter =  JsonSerializer.Deserialize<DatabaseFilter>(json);
-            }
+                StudentNameFilter = StudentName,
+                IssuerNameFilter = IssuerName,
+                MeritValueFilter = Value,
+                MeritStartDateFilter = StartDate,
+                MeritEndDateFilter = EndDate
+            };
 
             if (databaseFilter == null) return Partial("_DatabaseList", this);
             userDatabaseService.IsFiltered = true;
@@ -133,9 +149,11 @@ namespace Merit_Tracker.Pages
             var filterResult = await userDatabaseService.FilterMeritDatabaseAsync(databaseFilter, dbContext, CurrentDatabase);
             if (filterResult == null) return Partial("_DatabaseList", this);
 
-            MeritRecords = filterResult;
+            if (CurrentUser.Role == UserRole.Admin) MeritRecords = filterResult;
+            else MeritRecords = filterResult.Where(m => m.IssuerID == CurrentUser.ID).ToList();
 
-			return Partial("_DatabaseList", this);
+
+            return Partial("_DatabaseList", this);
 
 		}
 
@@ -166,7 +184,8 @@ namespace Merit_Tracker.Pages
 			if (CurrentDatabase == null) return RedirectToPage("/Dashboard"); // If database doesn't belong to user, redirect back to dashboard
 
 			// Get all merit records from the database
-			MeritRecords = await dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToListAsync();
+            if (CurrentUser.Role == UserRole.Admin) MeritRecords = await dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).ToListAsync();
+            else MeritRecords = await dbContext.Merits.Where(m => m.DatabaseID == CurrentDatabase.DatabaseID).Where(m => m.IssuerID == CurrentUser.ID).ToListAsync();
 
             return null;
 		}

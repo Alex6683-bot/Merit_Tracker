@@ -33,10 +33,6 @@ namespace Merit_Tracker.Pages
             return RedirectToPage("Login");
         }
 
-        public void OnPost()
-        {
 
-            
-        }
     }
 }

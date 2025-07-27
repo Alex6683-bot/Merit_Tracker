@@ -1,5 +1,6 @@
 ﻿using Merit_Tracker.Database;
 using Merit_Tracker.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Merit_Tracker.Interfaces
 {

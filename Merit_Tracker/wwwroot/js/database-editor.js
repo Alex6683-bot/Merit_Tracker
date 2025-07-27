@@ -19,8 +19,9 @@ function bindRadioListeners() {
 function updateButtonState() {
     const radioCheckBoxes = document.querySelectorAll('.merit-view-radio');
     const anyChecked = Array.from(radioCheckBoxes).some(rb => rb.checked);
-    editButton.disabled = !anyChecked;
-    deleteButton.disabled = !anyChecked;
+
+    if (editButton) editButton.disabled = !anyChecked;
+    if (deleteButton) deleteButton.disabled = !anyChecked;
 }
 
 const meritRecordModal = document.querySelector('.merit-record-modal');
@@ -52,8 +53,8 @@ function changeModalState(title, dataMode) {
 }
 
 
-addButton.addEventListener('click', () => changeModalState("Add Merit Record", "add"));
-editButton.addEventListener('click', () => changeModalState("Edit Merit Record", "edit"));
+if (addButton) addButton.addEventListener('click', () => changeModalState("Add Merit Record", "add"));
+if (editButton) editButton.addEventListener('click', () => changeModalState("Edit Merit Record", "edit"));
 
 // Feedback Modal
 function showFeedbackModal(isSuccess, message) {
@@ -143,10 +144,12 @@ meritForm.addEventListener('submit', function (event) {
 
 const deleteModal = new bootstrap.Modal(document.getElementById('delete-confirmation-modal'));
 
-deleteButton.addEventListener('click', () => {
-    deleteModal.show();
+if (deleteButton) {
+    deleteButton.addEventListener('click', () => {
+        deleteModal.show();
 
-});
+    });
+}
 
 const confirmDeleteButton = document.querySelector('#confirmDelete');
 
@@ -236,7 +239,16 @@ filterForm.addEventListener('submit', function (event) {
         MeritEndDateFilter: filterEndDate.valueAsDate
     };
 
-    fetch('?handler=FilterMerit', {
+    let queryParams = new URLSearchParams();
+
+    if (filterData.StudentNameFilter) queryParams.append("StudentName", filterData.StudentNameFilter);
+    if (filterData.IssuerNameFilter) queryParams.append("IssuerName", filterData.IssuerNameFilter);
+    if (filterData.MeritValueFilter !== 0) queryParams.append("Value", filterData.MeritValueFilter);
+    if (filterData.MeritStartDateFilter) queryParams.append("StartDate", filterStartDate.value);
+    if (filterData.MeritEndDateFilter) queryParams.append("EndDate", filterEndDate.value);
+                              
+
+    fetch('?handler=FilterMerit&' + queryParams.toString(), {
         method: 'post',
         headers: {
             "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val(),  // Fix anti forgery issues

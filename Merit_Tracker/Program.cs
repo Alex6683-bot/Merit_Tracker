@@ -6,6 +6,7 @@ using Merit_Tracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddDbContext<AppDatabaseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MainConnection"))
 );

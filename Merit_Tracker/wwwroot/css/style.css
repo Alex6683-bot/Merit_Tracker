@@ -47,3 +47,13 @@ main {
     flex-direction: column;
     gap: 2rem;
 }
+
+button.nav-item {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}

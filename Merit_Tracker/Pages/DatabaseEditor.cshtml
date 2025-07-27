@@ -13,7 +13,6 @@
 				<div class="col">
 					<div class="page-heading">
 						<h1>Database Editor</h1>
-						<button class="export-button">Export as CSV</button>
 					</div>
 				</div>
 			</div>
@@ -21,12 +20,15 @@
 				<div class="col px-0 database-section">
 					<div class="row g-0">
 						<div class="database-heading col">
-							<h1>Mooroolbark College 2025</h1>
+							<h1>@Model.CurrentDatabase.Name</h1>
 							<div class="crud-section">
 								<button class="crud-button add-button" data-bs-toggle="modal" data-bs-target="#merit-record-modal"><img width="19" src="~/media/icons/plus.png" style="vertical-align: -2px"/></button>
-								<button class="crud-button edit-button" data-bs-toggle="modal" data-bs-target="#merit-record-modal"><img width="19" src="~/media/icons/edit.png" style="vertical-align: -1px"/></button>
-								<button class="crud-button delete-button"><img width="23" src="~/media/icons/delete.png" style="vertical-align: -3px"/></button>
-								<button class="crud-button filter-button"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
+								@if (Model.CurrentUser.Role == UserRole.Admin)
+								{
+									<button class="crud-button edit-button" data-bs-toggle="modal" data-bs-target="#merit-record-modal"><img width="19" src="~/media/icons/edit.png" style="vertical-align: -1px"/></button>
+									<button class="crud-button delete-button"><img width="23" src="~/media/icons/delete.png" style="vertical-align: -3px"/></button>
+								}
+							<button class="crud-button filter-button"><img width="22" src="~/media/icons/filter.png" style="vertical-align: -3px"/></button>
 							</div>
 						</div>
 					</div>
@@ -73,7 +75,7 @@
 								</div>
 								<div class="mb-4">
 									<label class="form-label fw-bold text-dark" for="housePoints">House Points:</label>
-									<input type="number" min="0" id="housePoints" class="form-control merit-input" placeholder="Enter house points" asp-for=@Model.MeritHousePoints required/>
+									<input type="number" min="0" max="100000" id="housePoints" class="form-control merit-input" placeholder="Enter house points" asp-for=@Model.MeritHousePoints required/>
 								</div>
 								<div class="d-grid">
 									<button type="submit" class="btn btn-primary btn-gradient text-white fw-bold rounded-pill merit-modal-submit">Submit</button>

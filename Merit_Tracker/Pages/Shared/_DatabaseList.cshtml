@@ -4,13 +4,22 @@
 }
 
 <ul class="merit-list">
-	@if (Model.userDatabaseService.IsFiltered)
-	{
-		<div class="filter-indicator">
-			Filtered
-			<button type="button" class="filter-close-btn" title="Remove Filter" onclick="removeFilter()">✖</button>
-		</div>
-	}
+
+	<div class="indicator-container">
+		@if (Model.userDatabaseService.IsFiltered)
+		{	
+			<div class="editor-indicator">
+				Filtered
+				<button type="button" class="filter-close-btn" title="Remove Filter" onclick="removeFilter()">✖</button>
+			</div>
+		}
+		@if (Model.CurrentUser.Role == UserRole.Teacher)
+		{
+			<div class="editor-indicator">
+				Teacher-Only
+			</div>
+		}
+	</div>
 	@foreach (var meritRecord in Model.MeritRecords)
 	{
 		<li class="merit-view" data-merit-id="@meritRecord.Id" data-student-name="@meritRecord.StudentName" data-date="@meritRecord.DateOfIssue.Date.ToString("yyyy-MM-dd")" data-value="@((int)meritRecord.Value)" data-house-points="@meritRecord.HousePoints">

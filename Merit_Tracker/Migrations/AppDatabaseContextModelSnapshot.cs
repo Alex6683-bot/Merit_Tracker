@@ -61,7 +61,7 @@ namespace Merit_Tracker.Migrations
                         .HasColumnName("DatabaseID");
 
                     b.Property<DateTime>("DateOfIssue")
-                        .HasColumnType("date")
+                        .HasColumnType("timestamptz")
                         .HasColumnName("DateOfIssue");
 
                     b.Property<int>("HousePoints")
@@ -75,7 +75,7 @@ namespace Merit_Tracker.Migrations
                     b.Property<string>("IssuerName")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("IssueName");
+                        .HasColumnName("IssuerName");
 
                     b.Property<string>("StudentName")
                         .IsRequired()

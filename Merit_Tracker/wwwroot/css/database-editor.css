@@ -263,8 +263,14 @@ input[type="radio"]:checked {
     opacity: 0.8;
 }
 
+.indicator-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
 
-.filter-indicator {
+
+.editor-indicator {
     align-self: flex-start;
     background-color: #bdc3c7;
     color: white;

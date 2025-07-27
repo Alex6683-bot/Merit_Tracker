@@ -33,7 +33,7 @@ namespace Merit_Tracker.Models
         [Column("IssuerID")]
         public int IssuerID { get; set; }
 
-		[Column("IssueName")]
+		[Column("IssuerName")]
         public string IssuerName { get; set; }
 
 
