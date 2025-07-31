@@ -3,20 +3,34 @@ const editButton = document.querySelector('.edit-button');
 const deleteButton = document.querySelector('.delete-button');
 const filterButton = document.querySelector('.filter-button');
 
+
+const filterStudentName = document.getElementById('filterStudentName');
+const filterIssuerName = document.getElementById('filterIssuerName');
+const filterMeritValue = document.getElementById('filterMeritValue');
+const filterStartDate = document.getElementById('filterStartDate');
+const filterEndDate = document.getElementById('filterEndDate');
+const filterMeritYearLevel = document.getElementById('filterYearLevel');
+
+const filterSubmitButton = document.querySelector('.merit-modal-filter-button');
+
+const filterForm = document.querySelector('.filter-form');
+
+let urlQueryParams = new URLSearchParams(window.location.search); // For filtering
+
 bindRadioListeners();
-updateButtonState();
+updateControlButtonState();
 
 // Binding listeners to each radio boxes
 function bindRadioListeners() {
     const radioCheckBoxes = document.querySelectorAll('.merit-view-radio');
     radioCheckBoxes.forEach((radioCheckBox) => {
-        radioCheckBox.addEventListener('change', updateButtonState);
+        radioCheckBox.addEventListener('change', updateControlButtonState);
     });
 }
 
 
 // Disable Edit & Delete buttons if radio button is not checked
-function updateButtonState() {
+function updateControlButtonState() {
     const radioCheckBoxes = document.querySelectorAll('.merit-view-radio');
     const anyChecked = Array.from(radioCheckBoxes).some(rb => rb.checked);
 
@@ -41,6 +55,7 @@ function changeModalState(title, dataMode) {
         const meritValueInput = document.querySelector('#meritValue');
         const meritHousePointsInput = document.querySelector('#housePoints');
         const meritIDInput = document.querySelector('#meritID');
+        const meritYearLevelInput = document.querySelector('#meritYearLevel');
 
         let selectedRadio = document.querySelector('input[name="merit-select-radio"]:checked');
         const meritRecord = selectedRadio.closest('.merit-view'); // Get merit view/record from the selected radio
@@ -49,6 +64,7 @@ function changeModalState(title, dataMode) {
         meritValueInput.value = meritRecord.getAttribute('data-value');
         meritHousePointsInput.value = meritRecord.getAttribute('data-house-points');
         meritIDInput.value = meritRecord.getAttribute('data-merit-id');
+        meritYearLevelInput.value = meritRecord.getAttribute('data-merit-year-level');
     }
 }
 
@@ -97,7 +113,7 @@ meritForm.addEventListener('submit', function (event) {
 
     // Request to add merit handler
     if (meritForm.getAttribute('data-mode') == 'add') {
-        fetch('?handler=AddMerit', {
+        fetch('?handler=AddMerit&' + urlQueryParams.toString(), {
             method: 'post',
             body: formData
         }).then(response => {
@@ -113,13 +129,14 @@ meritForm.addEventListener('submit', function (event) {
                 const meritList = document.querySelector('.merit-list');
                 meritList.innerHTML = responseHtml;
                 bindRadioListeners();
-                updateButtonState();
+                updateControlButtonState();
+                updateFilterInputs();
             }
         });
     }
     // Resquest to edit merit handler
     else if (meritForm.getAttribute('data-mode') == 'edit') {
-        fetch('?handler=EditMerit', {
+        fetch('?handler=EditMerit&' + urlQueryParams.toString(), {
             method: 'post',
             body: formData
         }).then(response => {
@@ -135,7 +152,9 @@ meritForm.addEventListener('submit', function (event) {
                 const meritList = document.querySelector('.merit-list');
                 meritList.innerHTML = responseHtml;
                 bindRadioListeners();
-                updateButtonState();
+                updateControlButtonState();
+                updateFilterInputs();
+
             }
         });
     }
@@ -162,7 +181,7 @@ confirmDeleteButton.addEventListener('click', () => {
     const formData = new FormData();
     formData.append('MeritID', meritId);
 
-    fetch('?handler=DeleteMerit', {
+    fetch('?handler=DeleteMerit&' + urlQueryParams.toString(), {
         method: 'post',
         headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() }, // Fix anti forgery issues
         body: formData
@@ -178,10 +197,26 @@ confirmDeleteButton.addEventListener('click', () => {
             const meritList = document.querySelector('.merit-list');
             meritList.innerHTML = responseHtml;
             bindRadioListeners();
-            updateButtonState();
+            updateControlButtonState();
+            updateFilterInputs();
         }
     })
 });
+
+
+
+
+function removeParams() {
+    urlQueryParams.delete("studentName");
+    urlQueryParams.delete("issuerName");
+    urlQueryParams.delete("value");
+    urlQueryParams.delete("startDate");
+    urlQueryParams.delete("endDate");
+    urlQueryParams.delete("yearLevel");
+
+    history.replaceState(null, '', '?' + urlQueryParams.toString()); // updating the url route values
+
+}
 
 // Show filter modal on click
 const filterModal = new bootstrap.Modal(document.getElementById('merit-filter-modal'));
@@ -189,22 +224,14 @@ filterButton.addEventListener('click', () => {
     filterModal.show();
 });
 
-const filterStudentName = document.getElementById('filterStudentName');
-const filterIssuerName = document.getElementById('filterIssuerName');
-const filterMeritValue = document.getElementById('filterMeritValue');
-const filterStartDate = document.getElementById('filterStartDate');
-const filterEndDate = document.getElementById('filterEndDate');
 
-const filterSubmitButton = document.querySelector('.merit-modal-filter-button');
-
-const filterForm = document.querySelector('.filter-form');
-
-function validateFilterInputs() {
-    let hasAnyFilters = !(filterStudentName.value == "" &&
-        filterIssuerName.value == "" &&
-        parseInt(filterMeritValue.value, 0) == 0 &&
+function updateFilterInputs() {
+    let hasAnyFilters = !(filterStudentName.value.trim() == "" &&
+        filterIssuerName.value.trim() == "" &&
+        parseInt(filterMeritValue.value, 10) == 0 &&
         filterStartDate.valueAsDate == null &&
-        filterEndDate.valueAsDate == null
+        filterEndDate.valueAsDate == null &&
+        filterMeritYearLevel.value.trim() == ""
     );
 
     // Validate Dates
@@ -217,12 +244,12 @@ function validateFilterInputs() {
     filterSubmitButton.disabled = !(hasAnyFilters && hasValidDateRange);
 }
 
-validateFilterInputs();
+updateFilterInputs();
 
 // Validation
 filterForm.querySelectorAll('input, select').forEach(input => {
     input.addEventListener('change', () => {
-        validateFilterInputs();
+        updateFilterInputs();
     })
 })
 
@@ -234,29 +261,32 @@ filterForm.addEventListener('submit', function (event) {
     let filterData = {
         StudentNameFilter: filterStudentName.value.trim(),
         IssuerNameFilter: filterIssuerName.value.trim(),
+        YearLevelFilter: filterMeritYearLevel.value.trim(),
         MeritValueFilter: parseInt(filterMeritValue.value, 0),
         MeritStartDateFilter: filterStartDate.valueAsDate,
         MeritEndDateFilter: filterEndDate.valueAsDate
     };
 
-    let queryParams = new URLSearchParams();
+    removeParams();
 
-    if (filterData.StudentNameFilter) queryParams.append("StudentName", filterData.StudentNameFilter);
-    if (filterData.IssuerNameFilter) queryParams.append("IssuerName", filterData.IssuerNameFilter);
-    if (filterData.MeritValueFilter !== 0) queryParams.append("Value", filterData.MeritValueFilter);
-    if (filterData.MeritStartDateFilter) queryParams.append("StartDate", filterStartDate.value);
-    if (filterData.MeritEndDateFilter) queryParams.append("EndDate", filterEndDate.value);
+
+    if (filterData.StudentNameFilter) urlQueryParams.append("studentName", filterData.StudentNameFilter);
+    if (filterData.IssuerNameFilter) urlQueryParams.append("issuerName", filterData.IssuerNameFilter);
+    if (filterData.MeritValueFilter !== 0) urlQueryParams.append("value", filterData.MeritValueFilter);
+    if (filterData.MeritStartDateFilter) urlQueryParams.append("startDate", filterStartDate.value);
+    if (filterData.MeritEndDateFilter) urlQueryParams.append("endDate", filterEndDate.value);
+    if (filterData.YearLevelFilter) urlQueryParams.append("yearLevel", filterData.YearLevelFilter);
                               
 
-    fetch('?handler=FilterMerit&' + queryParams.toString(), {
+    fetch('?handler=FilterMerit&' + urlQueryParams.toString(), {
         method: 'post',
         headers: {
             "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val(),  // Fix anti forgery issues
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(filterData)
     }).then(response => {
         if (response.ok) {
+            history.replaceState(null, '', '?' + urlQueryParams.toString()); // updating the url route values
             return response.text();
         }
     }).then(responseHtml => {
@@ -265,7 +295,7 @@ filterForm.addEventListener('submit', function (event) {
             const meritList = document.querySelector('.merit-list');
             meritList.innerHTML = responseHtml;
             bindRadioListeners();
-            updateButtonState();
+            updateControlButtonState();
         }
     })
 })
@@ -285,11 +315,13 @@ function removeFilter() {
     }).then(responseHtml => {
         if (responseHtml) {
             filterForm.reset();
+            updateFilterInputs();
+            removeParams();
             filterModal.hide();
             const meritList = document.querySelector('.merit-list');
             meritList.innerHTML = responseHtml;
             bindRadioListeners();
-            updateButtonState();
+            updateControlButtonState();
         }
     })
 };

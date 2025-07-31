@@ -10,5 +10,16 @@ namespace Merit_Tracker.Classes
 		public int? MeritValueFilter { get; set; }
 		public DateTime? MeritStartDateFilter { get; set; }
 		public DateTime? MeritEndDateFilter { get; set; }
+		public string? MeritYearLevelFilter { get; set; }
+
+		public bool HasFilters()
+		{
+			return !string.IsNullOrWhiteSpace(StudentNameFilter)
+				|| !string.IsNullOrWhiteSpace(IssuerNameFilter)
+				|| MeritValueFilter.HasValue
+				|| MeritStartDateFilter.HasValue
+				|| MeritEndDateFilter.HasValue
+				|| !string.IsNullOrWhiteSpace(MeritYearLevelFilter);
+		}
 	}
 }

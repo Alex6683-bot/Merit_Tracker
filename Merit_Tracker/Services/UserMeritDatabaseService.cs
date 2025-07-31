@@ -21,22 +21,19 @@ namespace Merit_Tracker.Services
         /// Adds a new merit record to the database for a given student and returns the updated list.
         /// </summary>
         public async Task<List<MeritModel>?> AddRecordToDatabaseAsync(
-            string meritStudentName,
-            int meritHousePoints,
-            MeritValue meritValue,
-            int meritIssuerID,
-            string meritIssuerName,
+            MeritAddRequest meritAdd,
             DatabaseModel currentDatabaseModel,
             AppDatabaseContext dbContext
         )
         {
             // Validate input
-            if (string.IsNullOrWhiteSpace(meritStudentName) ||
-                string.IsNullOrWhiteSpace(meritIssuerName) ||
+            if (string.IsNullOrWhiteSpace(meritAdd.MeritStudentName) ||
+                string.IsNullOrWhiteSpace(meritAdd.MeritIssuerName) ||
+                string.IsNullOrWhiteSpace(meritAdd.MeritYearLevel) ||
                 currentDatabaseModel == null ||
                 dbContext == null ||
-                meritHousePoints < 0 ||
-                meritIssuerID <= 0)
+                meritAdd.MeritHousePoints < 0 ||
+                meritAdd.MeritIssuerID <= 0)
             {
                 return null;
             }
@@ -44,14 +41,15 @@ namespace Merit_Tracker.Services
             // Create new merit record and add to DB
             dbContext.Merits.Add(new MeritModel()
             {
-                StudentName = meritStudentName.Trim(),
-                HousePoints = meritHousePoints,
-                Value = meritValue,
+                StudentName = meritAdd.MeritStudentName.Trim(),
+                HousePoints = meritAdd.MeritHousePoints,
+                Value = meritAdd.MeritValue,
                 DateOfIssue = DateTime.UtcNow,
-                IssuerID = meritIssuerID,
+                IssuerID = meritAdd.MeritIssuerID,
                 DatabaseID = currentDatabaseModel.DatabaseID,
-                IssuerName = meritIssuerName.Trim()
-            });
+                IssuerName = meritAdd.MeritIssuerName.Trim(),
+                Yearlevel = meritAdd.MeritYearLevel.Trim()
+            }); ;
 
             // Save to DB
             await dbContext.SaveChangesAsync();
@@ -65,20 +63,20 @@ namespace Merit_Tracker.Services
         /// <summary>
         /// Edits a merit record in the database with new values and returns the updated merit list.
         /// </summary>
-        public async Task<List<MeritModel>> EditRecordInDatabaseAsync(string meritStudentName, MeritValue meritValue, int meritHousePoints,
-            int meritID, DatabaseModel currentDatabaseModel, AppDatabaseContext dbContext)
+        public async Task<List<MeritModel>> EditRecordInDatabaseAsync(MeritEditRequest meritEdit, int meritID, DatabaseModel currentDatabaseModel, AppDatabaseContext dbContext)
         {
             // Fetch merit by ID
             MeritModel merit = await dbContext.Merits.Where(m => m.Id == meritID).FirstOrDefaultAsync();
             if (merit == null) return null;
 
             // Validate inputs before editing
-            if (!string.IsNullOrWhiteSpace(meritStudentName) && meritHousePoints != null && meritValue != null && meritHousePoints >= 0)
+            if (!string.IsNullOrWhiteSpace(meritEdit.MeritStudentName) && !string.IsNullOrWhiteSpace(meritEdit.MeritYearLevel) && meritEdit.MeritHousePoints != null && meritEdit.MeritValue != null && meritEdit.MeritHousePoints >= 0)
             {
                 // Update properties
-                merit.StudentName = meritStudentName.Trim();
-                merit.Value = meritValue;
-                merit.HousePoints = meritHousePoints;
+                merit.StudentName = meritEdit.MeritStudentName.Trim();
+                merit.Value = meritEdit.MeritValue;
+                merit.HousePoints = meritEdit.MeritHousePoints;
+                merit.Yearlevel = meritEdit.MeritYearLevel.Trim();
 
                 await dbContext.SaveChangesAsync();
 
@@ -121,31 +119,41 @@ namespace Merit_Tracker.Services
         /// </summary>
         public async Task<List<MeritModel>> FilterMeritDatabaseAsync(DatabaseFilter filter, AppDatabaseContext dbContext, DatabaseModel currentDatabaseModel)
         {
-            // Start with base query from current database
-            var query = dbContext.Merits.AsQueryable();
-            query = query.Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID);
+            var baseQuery = dbContext.Merits.AsQueryable();
+            baseQuery = baseQuery.Where(m => m.DatabaseID == currentDatabaseModel.DatabaseID);
 
-            // Apply filters conditionally
-            if (!string.IsNullOrWhiteSpace(filter.StudentNameFilter))
-                query = query.Where(m => m.StudentName.Contains(filter.StudentNameFilter));
-
-            if (!string.IsNullOrWhiteSpace(filter.IssuerNameFilter))
-                query = query.Where(m => m.IssuerName.Contains(filter.IssuerNameFilter));
-
-            if (filter.MeritValueFilter > 0)
-                query = query.Where(m => m.Value == (MeritValue)filter.MeritValueFilter);
-
-            if (filter.MeritStartDateFilter.HasValue)
-                query = query.Where(m => m.DateOfIssue >= filter.MeritStartDateFilter.Value.Date.ToUniversalTime());
-
-            if (filter.MeritEndDateFilter.HasValue)
+			if (filter != null)
             {
-                var endDate = filter.MeritEndDateFilter.Value.Date.AddDays(1).ToUniversalTime();
-                query = query.Where(m => m.DateOfIssue < endDate);
-            }
+                // Start with base query from current database
+                var query = baseQuery;
 
-            // Return filtered results
-            return await query.ToListAsync();
+                // Apply filters conditionally
+                if (!string.IsNullOrWhiteSpace(filter.StudentNameFilter))
+                    query = query.Where(m => m.StudentName.Contains(filter.StudentNameFilter));
+
+                if (!string.IsNullOrWhiteSpace(filter.IssuerNameFilter))
+                    query = query.Where(m => m.IssuerName.Contains(filter.IssuerNameFilter));
+
+                if (!string.IsNullOrWhiteSpace(filter.MeritYearLevelFilter))
+                    query = query.Where(m => m.Yearlevel == filter.MeritYearLevelFilter);
+
+                if (filter.MeritValueFilter > 0)
+                    query = query.Where(m => m.Value == (MeritValue)filter.MeritValueFilter);
+
+                if (filter.MeritStartDateFilter.HasValue)
+                    query = query.Where(m => m.DateOfIssue >= filter.MeritStartDateFilter.Value.Date.ToUniversalTime());
+
+                if (filter.MeritEndDateFilter.HasValue)
+                {
+                    var endDate = filter.MeritEndDateFilter.Value.Date.AddDays(1).ToUniversalTime();
+                    query = query.Where(m => m.DateOfIssue < endDate);
+                }
+
+                // Return filtered results
+                return await query.ToListAsync();
+            }
+            // return base query if other filters are null
+            return await baseQuery.ToListAsync();
         }
     }
 }

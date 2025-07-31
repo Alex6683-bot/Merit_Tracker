@@ -6,7 +6,7 @@
 <ul class="merit-list">
 
 	<div class="indicator-container">
-		@if (Model.userDatabaseService.IsFiltered)
+		@if (Model.userMeritDatabaseService.IsFiltered)
 		{	
 			<div class="editor-indicator">
 				Filtered
@@ -22,7 +22,7 @@
 	</div>
 	@foreach (var meritRecord in Model.MeritRecords)
 	{
-		<li class="merit-view" data-merit-id="@meritRecord.Id" data-student-name="@meritRecord.StudentName" data-date="@meritRecord.DateOfIssue.Date.ToString("yyyy-MM-dd")" data-value="@((int)meritRecord.Value)" data-house-points="@meritRecord.HousePoints">
+		<li class="merit-view" data-merit-id="@meritRecord.Id" data-student-name="@meritRecord.StudentName" data-date="@meritRecord.DateOfIssue.Date.ToString("yyyy-MM-dd")" data-value="@((int)meritRecord.Value)" data-house-points="@meritRecord.HousePoints" data-merit-year-level="@meritRecord.Yearlevel">
 			<label class="merit-view-label">
 				<input type="radio" name="merit-select-radio" class="merit-view-radio form-check-input" />
 				<div class="merit-view-container">

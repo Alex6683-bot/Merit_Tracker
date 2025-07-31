@@ -70,7 +70,12 @@
 								</div>
 								<div class="mb-3">
 									<label class="form-label fw-bold text-dark" for="meritValue">Value:</label>
-									<select id="meritValue" class="form-select merit-input" asp-items="Html.GetEnumSelectList<Merit_Tracker.Models.MeritValue>()" asp-for=@Model.MeritValue required>
+									<select id="meritValue" class="form-select merit-input" asp-items="Html.GetEnumSelectList<MeritValue>()" asp-for=@Model.MeritValue required>
+									</select>
+								</div>
+								<div class="mb-3">
+									<label class="form-label fw-bold text-dark" for="meritValue">Year Level:</label>
+									<select id="meritYearLevel" class="form-select merit-input" asp-items="Model.YearLevels" asp-for=@Model.MeritYearLevel required>
 									</select>
 								</div>
 								<div class="mb-4">
@@ -99,42 +104,36 @@
 							<form class="filter-form">
 								<div class="mb-3">
 									<label class="form-label fw-bold text-dark" for="filterStudentName">Student Name:</label>
-									<input type="text" id="filterStudentName" class="form-control merit-input" placeholder="Enter student name" value="@Model.userDatabaseService.DatabaseFilter.StudentNameFilter"/>
+									<input type="text" id="filterStudentName" class="form-control merit-input" placeholder="Enter student name" value="@Model.userMeritDatabaseService.DatabaseFilter.StudentNameFilter"/>
 								</div>
 								<div class="mb-3">
 									<label class="form-label fw-bold text-dark" for="filterIssuerName">Issuer Name:</label>
-									<input type="text" id="filterIssuerName" class="form-control merit-input" placeholder="Enter issuer name" value="@Model.userDatabaseService.DatabaseFilter.IssuerNameFilter"/>
+									<input type="text" id="filterIssuerName" class="form-control merit-input" placeholder="Enter issuer name" value="@Model.userMeritDatabaseService.DatabaseFilter.IssuerNameFilter"/>
 								</div>
 								<div class="mb-3">
-									<label class="form-label fw-bold text-dark" for="filterMeritValue">Merit Value:</label>
-									<select id="filterMeritValue" class="form-select merit-input filterMeritValue">
+									<label class="form-label fw-bold text-dark" for="filterMeritValue">Value:</label>
+									<select id="filterMeritValue" class="form-select merit-input filterMeritValue" asp-items="Html.GetEnumSelectList<MeritValue>()">
 										<option value="0">None</option>
-										@{
-											foreach (MeritValue meritValue in Enum.GetValues(typeof(Merit_Tracker.Models.MeritValue))) 
-											{
-												if (Model.userDatabaseService.DatabaseFilter.MeritValueFilter != null)
-												{
-													if (meritValue == (MeritValue)Model.userDatabaseService.DatabaseFilter.MeritValueFilter) { <option value="@((int)meritValue)">@meritValue</option> }
-												}
-												else{
-													<option value="@((int)meritValue)">@meritValue</option> 
-												}
-											}
-										}
-									}
+									</select>
+								</div>
+
+							<div class="mb-3">
+								<label class="form-label fw-bold text-dark" for="filterMeritValue">Year Level:</label>
+								<select id="filterYearLevel" class="form-select merit-input filterMeritValue" asp-items="Model.YearLevels" >
+									<option value="">None</option>
 								</select>
 							</div>
 							<div class="mb-3">
 								<label class="form-label fw-bold text-dark" for="filterStartDate">Start Date:</label>
 								@{
-									var startDate = Model.userDatabaseService.DatabaseFilter.MeritStartDateFilter;
+									var startDate = Model.userMeritDatabaseService.DatabaseFilter.MeritStartDateFilter;
 									<input type="date" id="filterStartDate" class="form-control merit-input" value="@(startDate == null ? "" : startDate.Value.ToLocalTime().ToString("dd/MM/yyyy"))" />
 								}
 								</div>
 								<div class="mb-4">
 									<label class="form-label fw-bold text-dark" for="filterEndDate">End Date:</label>
 									@{
-										var endDate = Model.userDatabaseService.DatabaseFilter.MeritEndDateFilter;
+										var endDate = Model.userMeritDatabaseService.DatabaseFilter.MeritEndDateFilter;
 									<input type="date" id="filterEndDate" class="form-control merit-input" value="@(endDate == null ? "" : endDate.Value.ToLocalTime().ToString("dd/MM/yyyy"))" />
 									}
 								</div>

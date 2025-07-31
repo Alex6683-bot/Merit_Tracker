@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,10 +14,13 @@ namespace Merit_Tracker.Models
         Compassion        // Merit for compassion
     }
 
+
     // Model used for representing a merit record stored in the "Merits" table
     [Table("Merits")]
     public class MeritModel
     {
+
+
         // Primary key for each merit record
         [Key]
         public int Id { get; set; }
@@ -48,5 +52,9 @@ namespace Merit_Tracker.Models
         // The ID of the database (used to associate merits with a specific school or environment)
         [Column("DatabaseID")]
         public int DatabaseID { get; set; }
+
+        // The year level chosen for the merit. It is represented by a string 
+        [Column("YearLevel")]
+        public string Yearlevel { get; set; }
     }
 }
